@@ -1,0 +1,30 @@
+name: CICD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Chekout Source
+        uses: actions/checkout@v3
+      - name: login to docker hub
+        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWD}}
+      - name: Build Docker Image
+        run: docker build -t hamza6/nodejs_sqilcoo .
+      - name: Publish Image to docker hub
+        run: docker push hamza6/nodejs_sqilcoo:latest
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: pull image from docker hub
+        run: sudo docker pull hamza6/nodejs_sqilcoo:latest
+      - name: Run Docker Container
+        run: sudo docker run -d -p 8080:8080 --name nodejs-container -e MONGO_PASSWORD="${{secrets.MONGO_PASSWORD}}" hamza6/nodejs_sqilcoo:latest
