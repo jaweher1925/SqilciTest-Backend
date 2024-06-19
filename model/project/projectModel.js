@@ -22,6 +22,7 @@ const ProjectSchema = new Schema({
         type: String,
         required: true
     },
+    
     mode: {
         type: String,
         required: true
