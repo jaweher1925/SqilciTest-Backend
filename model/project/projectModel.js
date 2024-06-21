@@ -16,13 +16,13 @@ const ProjectSchema = new Schema({
     },
     difficulty: {
         type: String,
+        enum: ['Easy', 'Medium', 'Hard'], // Example of enum values
         required: true
     },
     duration: {
         type: String,
         required: true
     },
-    
     mode: {
         type: String,
         required: true
@@ -53,6 +53,6 @@ const ProjectSchema = new Schema({
     }
 });
 
-const ProjectModel = mongoose.model('projects', ProjectSchema);
+const ProjectModel = mongoose.model('Project', ProjectSchema);
 
 module.exports = ProjectModel;

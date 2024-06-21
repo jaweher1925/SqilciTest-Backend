@@ -1,37 +1,29 @@
 const Classes = require('../../model/ClasseOnlineModel');
 
 module.exports = {
-  createClasses: async function (req, res) {
+  createClass: async (req, res) => {
     try {
-      const { title, date, duration, mentorId, studentId, price, description } = req.body;
+      const { title, progress, duration, mentorId, studentIds, price, description } = req.body;
 
-      // Validate input data
-      if (!title ||  !duration || !mentorId || !studentId || !price || !description) {
+      // Validate input
+      if (!title || !duration || !mentorId || !studentIds || !price || !description) {
         return res.status(400).json({ success: false, message: 'Invalid input data' });
       }
 
-      // Create a new class instance
       const newClass = new Classes({
         title,
+        progress: progress || 0,
         duration,
         mentorId,
-        studentId,
+        studentIds,
         price,
-        description,
+        description
       });
 
-      // Save the new class to the database
       const savedClass = await newClass.save();
-
-      return res.status(201).json({
-        success: true,
-        data: savedClass,
-      });
+      return res.status(201).json({ success: true, data: savedClass });
     } catch (err) {
-      return res.status(500).json({
-        success: false,
-        error: err.message,
-      });
+      return res.status(500).json({ success: false, message: 'Server error', error: err.message });
     }
   },
 

@@ -5,7 +5,6 @@ const ClassesSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-
   duration: {
     type: String,
     required: true,
@@ -18,9 +17,9 @@ const ClassesSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  studentId: {
-    type: String,
-    required: true,
+  studentIds: {
+    type: [String], // Array of student IDs enrolled in the class
+    default: [],
   },
   price: {
     type: Number,

@@ -139,7 +139,7 @@ const {
     deleteCourseSale
 } = require('../Controller/CoursesSells/courseSalesController');
 
-const {  createClasses, updateClasses, getOnlineClasses,deleteClasses } = require('../Controller/ClassesOnline/ClassesOnlineController');
+const {   createClass, updateClasses, getOnlineClasses,deleteClasses } = require('../Controller/ClassesOnline/ClassesOnlineController');
 
 
 // User routes
@@ -157,7 +157,7 @@ routes.get('/projects/:id', getProjectsId);
 routes.delete('/projects/:id', deleteProject);
 
 // Classes routes
-routes.post('/OnlineClasses', createClasses); // Create a new course
+routes.post('/OnlineClasses',  createClass); // Create a new course
 routes.put('/OnlineClasses/:id', updateClasses); // Update course progress
 routes.get('/OnlineClasses', getOnlineClasses); // Fetch a specific course by ID
 routes.delete('/OnlineClasses/:id',deleteClasses);
