@@ -44,19 +44,29 @@ module.exports = {
 
     updateRoadmap: async (req, res) => {
         try {
-            const updatedRoadmap = await RoadmapModel.findByIdAndUpdate(
-                req.params.id,
-                req.body,
-                { new: true }
-            );
+            const { id } = req.params;
+            const updateData = req.body;
+    
+            // Log the incoming data
+            console.log('Incoming update data:', updateData);
+    
+            // Perform server-side validation
+            if (!updateData.title || !updateData.image || !updateData.rating) {
+                return res.status(400).json({ message: 'Required fields are missing' });
+            }
+    
+            const updatedRoadmap = await RoadmapModel.findByIdAndUpdate(id, updateData, { new: true });
+    
             if (!updatedRoadmap) {
                 return res.status(404).json({ message: 'Roadmap not found' });
             }
+    
             return res.status(200).json({ message: 'Roadmap updated successfully', data: updatedRoadmap });
         } catch (err) {
+            console.error('Error updating roadmap:', err.message);
             return res.status(500).json({ message: 'Failed to update roadmap', error: err.message });
-        }
-    },
+        }},
+
     deleteRoadmap: async (req, res) => {
         try {
             const deletedRoadmap = await RoadmapModel.findByIdAndDelete(req.params.id);

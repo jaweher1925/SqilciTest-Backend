@@ -6,6 +6,7 @@ const UserRegistryValidate = (req, res, next) => {
         email: Joi.string().email().required(),
         password: Joi.string().min(4).required(),
         phone: Joi.number().min(8).required(),
+        role: Joi.string().required()
     });
     const { error, value } = schema.validate(req.body);
     if (error) {

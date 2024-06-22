@@ -1,20 +1,36 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+const UserModel = require("../model/UserModel");
 
-const ensureAuthenticated = (req, res, next) => {
-  const token = req.headers.authorization;
+const authenticateJWT = (req, res, next) => {
+  const token = req.cookies.jwtToken;
 
   if (!token) {
-    return res.status(403).json({ message: 'Token is required' });
+    return res
+      .status(403)
+      .json({ message: "Access denied. No token provided." });
   }
 
   try {
-    // Verify JWT token
     const decoded = jwt.verify(token, process.env.SECRET);
-    req.user = decoded; // Attach decoded user information to the request object
-    next(); // Move to the next middleware
+    req.user = decoded;
+    next();
   } catch (err) {
-    return res.status(403).json({ message: "Token is not valid, or it's expired" });
+    return res.status(401).json({ message: "Invalid token." });
   }
 };
 
-module.exports = { ensureAuthenticated };
+const authorizeRole = (roles) => {
+  return (req, res, next) => {
+    if (roles.includes(req.user.role)) {
+      next();
+    } else {
+      return res
+        .status(403)
+        .json({
+          message: "Access denied. You do not have the required permissions.",
+        });
+    }
+  };
+};
+
+module.exports = { authenticateJWT, authorizeRole };

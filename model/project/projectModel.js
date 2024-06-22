@@ -16,7 +16,7 @@ const ProjectSchema = new Schema({
     },
     difficulty: {
         type: String,
-        enum: ['Easy', 'Medium', 'Hard'], // Example of enum values
+        enum: ['Easy', 'Medium', 'Hard'], 
         required: true
     },
     duration: {
@@ -31,6 +31,10 @@ const ProjectSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Mentors'
     }],
+    studentIds: {
+        type: [String], 
+        default: [],
+      },
     tech_stack: {
         type: [String],
         required: true

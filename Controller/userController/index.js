@@ -1,89 +1,86 @@
 const UserModel = require("../../model/UserModel");
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken')
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { authenticateJWT, authorizeRole } = require("../../utils/auth");
 
 module.exports = {
-    registerUser: async (req, res) => {
-                try {
-          const { first_name, last_name, email, password, phone, role, education, education_level, skills, company_name } = req.body;
-      
-          // Check if user already exists
-          const existingUser = await User.findOne({ email });
-          if (existingUser) {
-            return res.status(400).json({ error: "User already exists" });
-          }
-      
-          // Hash the password
-          const salt = await bcrypt.genSalt(10);
-          const hashedPassword = await bcrypt.hash(password, salt);
-      
-          // Create new user
-          const newUser = new User({
-            first_name,
-            last_name,
-            email,
-            password: hashedPassword,
-            phone,
-            role,
-            education,
-            education_level,
-            skills,
-            company_name,
-          });
-      
-          // Save user to the database
-          await newUser.save();
-        
-          res.status(201).json({ message: "User registered successfully" });
-        } catch (error) {
-          console.error(error);
-          res.status(500).json({ error: "Server error" });
-        }
-      },
-
- 
-
-    loginUser: async (req, res) => {
-        try {
-            const user = await UserModel.findOne({ email: req.body.email });
-            if (!user) {
-                return res.status(401).json({ message: 'Authentication failed. Invalid email or password' });
-            }
-
-            const isPassEqual = await bcrypt.compare(req.body.password, user.password);
-            if (!isPassEqual) {
-                return res.status(401).json({ message: 'Authentication failed. Invalid email or password' });
-            }
-
-            const tokenObject = {
-                _id: user._id,
-                first_name: user.first_name,
-                last_name: user.last_name,
-                email: user.email
-            }
-            const jwtToken = jwt.sign(tokenObject, process.env.SECRET, { expiresIn: '4h' });
-            res.cookie('jwtToken', jwtToken, { httpOnly: true });
-            return res.status(200).json({ jwtToken, tokenObject });
-        } catch (err) {
-            return res.status(500).json({ message: 'Failed to login user', error: err.message });
-        }
-    },
-
-    logoutUser: async (req, res) => {
-        try {
-            res.clearCookie('jwtToken');
-            return res.status(200).json({ message: 'Logged out successfully' });
-        } catch (err) {
-            return res.status(500).json({ message: 'Failed to logout user', error: err.message });
-        }
-    },
-
-    getUsers: async (req, res) => {
-        try {
-            const users = await UserModel.find({}, { password: 0 });
-            return res.status(200).json({ data: users });
-        } catch (err) {
-            return res.status(500).json({ message: 'Failed to fetch users', error: err.message });
-        }
+  registerUser: async (req, res) => {
+    const userModel = new UserModel(req.body);
+    userModel.password = await bcrypt.hash(req.body.password, 10);
+    try {
+      const response = await userModel.save();
+      response.password = undefined;
+      return res.status(201).json({ message: "success", data: response });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: "Failed to register user", error: err.message });
     }
-}
+  },
+
+  loginUser: async (req, res) => {
+    try {
+      const user = await UserModel.findOne({ email: req.body.email });
+      if (!user) {
+        return res.status(401).json({
+          message: "Authentication failed. Invalid email or password",
+        });
+      }
+
+      const isPassEqual = await bcrypt.compare(
+        req.body.password,
+        user.password
+      );
+      if (!isPassEqual) {
+        return res.status(401).json({
+          message: "Authentication failed. Invalid email or password",
+        });
+      }
+
+      const tokenObject = {
+        _id: user._id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        role: user.role,
+      };
+      const jwtToken = jwt.sign(tokenObject, process.env.SECRET, {
+        expiresIn: "4h",
+      });
+      res.cookie("jwtToken", jwtToken, { httpOnly: true });
+      return res.status(200).json({ jwtToken, tokenObject });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: "Failed to login user", error: err.message });
+    }
+  },
+
+  logoutUser: async (req, res) => {
+    try {
+      res.clearCookie("jwtToken");
+      return res.status(200).json({ message: "Logged out successfully" });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: "Failed to logout user", error: err.message });
+    }
+  },
+
+  getUsers: [
+    authenticateJWT,
+    authorizeRole(["admin", "mentor"]),
+    async (req, res) => {
+      try {
+        const users = await UserModel.find({}, { password: 0 });
+        return res.status(200).json({ data: users });
+      } catch (err) {
+        return res
+          .status(500)
+          .json({ message: "Failed to fetch users", error: err.message });
+      }
+    },
+    
+  ],
+ 
+};

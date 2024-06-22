@@ -2,9 +2,10 @@ const express = require('express');
 const { registerUser, loginUser, getUsers, logoutUser } = require('../Controller/userController');
 const { UserRegistryValidate, userLoginValidate } = require('../utils/userValidate');
 const { ensureAuthenticated } = require('../utils/auth');
+const { authenticateJWT, authorizeRole } = require("../utils/auth");
 
 // model validation Functions
-const projectApplicantValidate = require('../utils/modelValidate/projectAppliccantValidate');
+const projectApplicantValidate = require("../utils/modelValidate/projectAppliccantValidate");
 const RoadmapProgressValidation = require('../utils/modelValidate/roadmapProgressValidate');
 const RoadmapValidation = require('../utils/modelValidate/roadmapValidate');
 const TestimonialValidation = require('../utils/modelValidate/testimonialValidate');
@@ -143,19 +144,37 @@ const {   createClass, updateClasses, getOnlineClasses,deleteClasses } = require
 
 
 // User routes
-routes.post('/register', UserRegistryValidate, registerUser);
-routes.post('/login', userLoginValidate, loginUser);
-routes.post('/logout', ensureAuthenticated, logoutUser);
-routes.get('/users', ensureAuthenticated, getUsers);
+
+routes.post("/register", UserRegistryValidate, registerUser);
+routes.post("/login", userLoginValidate, loginUser);
+routes.post("/logout", authenticateJWT, logoutUser);
+routes.get("/users", [authenticateJWT, authorizeRole(["admin"])], getUsers);
+
 
 // Project routes
-routes.post('/projects', createProject);
-routes.post('/projects/bulk', createBulkProject);
-routes.get('/projects', getProjects);
-routes.put('/projects/:id', ProjectValidation, updateProject);
-routes.get('/projects/:id', getProjectsId);
-routes.delete('/projects/:id', deleteProject);
-
+routes.post(
+    "/projects",
+    [authenticateJWT, authorizeRole(["admin"])],
+    createProject
+  );
+  routes.post(
+    "/projects/bulk",
+    [authenticateJWT, authorizeRole(["admin"])],
+    createBulkProject
+  );
+  routes.get("/projects", getProjects);
+  routes.put(
+    "/projects/:id",
+    [authenticateJWT, authorizeRole(["admin"]), ProjectValidation],
+    updateProject
+  );
+  routes.get("/projects/:id", getProjectsId);
+  routes.delete(
+    "/projects/:id",
+    [authenticateJWT, authorizeRole(["admin"])],
+    deleteProject
+  );
+  
 // Classes routes
 routes.post('/OnlineClasses',  createClass); // Create a new course
 routes.put('/OnlineClasses/:id', updateClasses); // Update course progress
@@ -163,47 +182,115 @@ routes.get('/OnlineClasses', getOnlineClasses); // Fetch a specific course by ID
 routes.delete('/OnlineClasses/:id',deleteClasses);
 
 // Roadmap routes
-routes.post('/roadmaps', createRoadmap);
-routes.post('/roadmaps/bulk', createBulkRoadmaps);
-routes.get('/roadmaps', getRoadmaps);
-routes.put('/roadmaps/:id', RoadmapValidation, updateRoadmap);
-routes.get('/roadmaps/:id', getRoadmapById);
-routes.delete('/roadmaps/:id', deleteRoadmap);
-
+routes.post(
+    "/roadmaps",
+    [authenticateJWT, authorizeRole(["admin"])],
+    createRoadmap
+  );
+  routes.post(
+    "/roadmaps/bulk",
+    [authenticateJWT, authorizeRole(["admin"])],
+    createBulkRoadmaps
+  );
+  routes.get("/roadmaps", getRoadmaps);
+  routes.put(
+    "/roadmaps/:id",
+    [authenticateJWT, authorizeRole(["admin"])],
+    RoadmapValidation,
+    updateRoadmap
+  );
+  routes.get("/roadmaps/:id", getRoadmapById);
+  routes.delete(
+    "/roadmaps/:id",
+    [authenticateJWT, authorizeRole(["admin"])],
+    deleteRoadmap
+  );
 // Mentor routes
-routes.post('/mentors', createMentor);
-routes.get('/mentors', getAllMentors);
-routes.get('/mentors/:id', getMentorById);
-routes.put('/mentors/:id', MentorValidation, updateMentor);
-routes.delete('/mentors/:id', deleteMentor);
-
+routes.post(
+    "/mentors",
+    [authenticateJWT, authorizeRole(["admin"])],
+    createMentor
+  );
+  routes.get("/mentors", getAllMentors);
+  routes.get("/mentors/:id", getMentorById);
+  routes.put(
+    "/mentors/:id",
+    [authenticateJWT, authorizeRole(["admin"])],
+    MentorValidation,
+    updateMentor
+  );
+  routes.delete(
+    "/mentors/:id",
+    [authenticateJWT, authorizeRole(["admin"])],
+    deleteMentor
+  );
+  
 // Mentorship request routes
-routes.post('/mentorship-requests', createMentorshipRequest);
-routes.get('/mentorship-requests', getAllMentorshipRequests);
-routes.get('/mentorship-requests/:id', getMentorshipRequestById);
-routes.put('/mentorship-requests/:id', MentorshipRequestValidation, updateMentorshipRequest);
-routes.delete('/mentorship-requests/:id', deleteMentorshipRequest);
 
+routes.post(
+    "/mentorship-requests",
+    [authenticateJWT, authorizeRole(["admin"])],
+    createMentorshipRequest
+  );
+  routes.get("/mentorship-requests", getAllMentorshipRequests);
+  routes.get(
+    "/mentorship-requests/:id",
+    [authenticateJWT, authorizeRole(["admin"])],
+    getMentorshipRequestById
+  );
+  routes.put(
+    "/mentorship-requests/:id",
+    [authenticateJWT, authorizeRole(["admin"])],
+    MentorshipRequestValidation,
+    updateMentorshipRequest
+  );
+  routes.delete(
+    "/mentorship-requests/:id",
+    [authenticateJWT, authorizeRole(["admin"])],
+    deleteMentorshipRequest
+  );
+  
 // Project applicant routes
-routes.post('/project-applicants', createProjectApplicant);
-routes.get('/project-applicants', getAllProjectApplicants);
-routes.get('/project-applicants/:id', getProjectApplicantById);
-routes.put('/project-applicants/:id', projectApplicantValidate, updateProjectApplicant);
-routes.delete('/project-applicants/:id', deleteProjectApplicant);
+routes.post("/project-applicants", createProjectApplicant);
+routes.get("/project-applicants", getAllProjectApplicants);
+routes.get("/project-applicants/:id", getProjectApplicantById);
+routes.put(
+  "/project-applicants/:id",
+  projectApplicantValidate,
+  updateProjectApplicant
+);
+routes.delete("/project-applicants/:id", deleteProjectApplicant);
 
 // Project progress routes
-routes.post('/project-progress', createProjectProgress);
-routes.get('/project-progress', getAllProjectProgress);
-routes.get('/project-progress/:id', getProjectProgressById);
-routes.put('/project-progress/:id', ProjectProgressValidation, updateProjectProgress);
-routes.delete('/project-progress/:id', deleteProjectProgress);
 
+routes.post(
+    "/project-progress",
+    [authenticateJWT, authorizeRole(["admin"])],
+    createProjectProgress
+  );
+  routes.get("/project-progress", getAllProjectProgress);
+  routes.get("/project-progress/:id", getProjectProgressById);
+  routes.put(
+    "/project-progress/:id",
+    [authenticateJWT, authorizeRole(["admin"])],
+    ProjectProgressValidation,
+    updateProjectProgress
+  );
+  routes.delete(
+    "/project-progress/:id",
+    [(authenticateJWT, authorizeRole(["admin"]))],
+    deleteProjectProgress
+  );
 // Roadmap progress routes
-routes.post('/roadmap-progress', createRoadmapProgress);
-routes.get('/roadmap-progress', getRoadmapProgress);
-routes.get('/roadmap-progress/:id', getRoadmapProgressById);
-routes.put('/roadmap-progress/:id', RoadmapProgressValidation, updateRoadmapProgress);
-routes.delete('/roadmap-progress/:id', deleteRoadmapProgress);
+routes.post("/roadmap-progress", createRoadmapProgress);
+routes.get("/roadmap-progress", getRoadmapProgress);
+routes.get("/roadmap-progress/:id", getRoadmapProgressById);
+routes.put(
+  "/roadmap-progress/:id",
+  RoadmapProgressValidation,
+  updateRoadmapProgress
+);
+routes.delete("/roadmap-progress/:id", deleteRoadmapProgress);
 
 // Testimonial routes
 routes.post('/testimonials', createTestimonial);
