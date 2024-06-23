@@ -37,6 +37,7 @@ const UserSchema = new Schema({
   portfolios: [{ type: Schema.Types.ObjectId, ref: "Portfolio" }],
   enrolledRoadmaps: [{ type: Schema.Types.ObjectId, ref: "RoadmapProgress" }],
   enrolledProjects: [{ type: Schema.Types.ObjectId, ref: "ProjectProgress" }],
+  enrolledClasses: [{ type: Schema.Types.ObjectId, ref: "classesProgress" }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
