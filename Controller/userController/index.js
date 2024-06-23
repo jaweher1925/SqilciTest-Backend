@@ -83,4 +83,33 @@ module.exports = {
     
   ],
  
+  getPortfolio: async (req, res) => {
+    try {
+      const user = await user.findById(req.params.userId)
+        .populate('portfolios')
+        .populate('enrolledRoadmaps')
+        .populate('enrolledProjects')
+        .populate('enrolledClasses');
+      if (!user) {
+        return res.status(404).send('User not found');
+      }
+      res.json(user);
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  },
+  
+  // Update user profile
+  put: async (req, res) => {
+    try {
+      const updatedUser = await user.findByIdAndUpdate(
+        req.params.userId,
+        { $set: req.body },
+        { new: true }
+      );
+      res.json(updatedUser);
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  }
 };

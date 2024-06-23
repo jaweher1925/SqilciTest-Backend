@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 const RoadmapProgress = require("./roadMapProgress");
 const ProjectProgress = require("./projectProgress");
 
+
 const PortfolioSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "users" },
   title: String,
@@ -21,6 +22,7 @@ const PortfolioSchema = new Schema({
   updatedAt: Date,
 });
 
+
 const UserSchema = new Schema({
   first_name: { type: String, required: true },
   last_name: { type: String, required: true },
@@ -30,6 +32,7 @@ const UserSchema = new Schema({
   portfolios: [{ type: Schema.Types.ObjectId, ref: "portfolios" }],
   enrolledRoadmaps: [{ type: Schema.Types.ObjectId, ref: "roadmapProgress" }],
   enrolledProjects: [{ type: Schema.Types.ObjectId, ref: "projectProgress" }],
+  enrolledClasses: [{ type: Schema.Types.ObjectId, ref: "classesProgress" }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

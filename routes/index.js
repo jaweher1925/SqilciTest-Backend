@@ -177,8 +177,8 @@ routes.post(
   
 // Classes routes
 routes.post('/OnlineClasses',  createClass); // Create a new course
-routes.put('/OnlineClasses/:id', updateClasses); // Update course progress
-routes.get('/OnlineClasses', getOnlineClasses); // Fetch a specific course by ID
+routes.put('/OnlineClasses/:id', updateClasses); 
+routes.get('/OnlineClasses', getOnlineClasses); 
 routes.delete('/OnlineClasses/:id',deleteClasses);
 
 // Roadmap routes

@@ -18,7 +18,7 @@ const ClassesSchema = new mongoose.Schema({
     required: true,
   },
   studentIds: {
-    type: [String], // Array of student IDs enrolled in the class
+    type: [String],
     default: [],
   },
   price: {
@@ -29,6 +29,10 @@ const ClassesSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  notification:{
+    type: [Object],
+  }
+  
 });
 
 const Classes = mongoose.models.Classes || mongoose.model('Classes', ClassesSchema);
