@@ -66,6 +66,16 @@ module.exports = {
         .json({ message: "Failed to logout user", error: err.message });
     }
   },
+  getUser:async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.user._id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+    return res.status(200).json({ user });
+  } catch (err) {
+    return res.status(500).json({ message: "Failed to fetch user.", error: err.message });
+  }},
 
   getUsers: [
     authenticateJWT,
@@ -80,7 +90,5 @@ module.exports = {
           .json({ message: "Failed to fetch users", error: err.message });
       }
     },
-    
   ],
- 
 };

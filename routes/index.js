@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, getUsers, logoutUser } = require('../Controller/userController');
+const { registerUser, loginUser, getUsers, logoutUser, getUser } = require('../Controller/userController');
 const { UserRegistryValidate, userLoginValidate } = require('../utils/userValidate');
 const { ensureAuthenticated } = require('../utils/auth');
 const { authenticateJWT, authorizeRole } = require("../utils/auth");
@@ -149,6 +149,7 @@ routes.post("/register", UserRegistryValidate, registerUser);
 routes.post("/login", userLoginValidate, loginUser);
 routes.post("/logout", authenticateJWT, logoutUser);
 routes.get("/users", [authenticateJWT, authorizeRole(["admin"])], getUsers);
+routes.get("/user", authenticateJWT, getUser);
 
 
 // Project routes

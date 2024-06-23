@@ -27,9 +27,14 @@ const UserSchema = new Schema({
   email: { type: String, unique: true },
   password: { type: String, required: true },
   phone: { type: Number, required: true },
-  portfolios: [{ type: Schema.Types.ObjectId, ref: "portfolios" }],
-  enrolledRoadmaps: [{ type: Schema.Types.ObjectId, ref: "roadmapProgress" }],
-  enrolledProjects: [{ type: Schema.Types.ObjectId, ref: "projectProgress" }],
+  role: {
+    type: String,
+    enum: ["admin", "mentor", "student"],
+    default: "student",
+  },
+  portfolios: [{ type: Schema.Types.ObjectId, ref: "Portfolio" }],
+  enrolledRoadmaps: [{ type: Schema.Types.ObjectId, ref: "RoadmapProgress" }],
+  enrolledProjects: [{ type: Schema.Types.ObjectId, ref: "ProjectProgress" }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
