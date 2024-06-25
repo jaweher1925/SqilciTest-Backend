@@ -14,6 +14,7 @@ module.exports = {
     getAllTasks :async (req, res) => {
         try {
           const tasks = await NotionModel.find();
+          
           return res.status(200).json({ data: tasks });
         } catch (err) {
           return res.status(500).json({ message: 'Error fetching tasks', error: err.message });

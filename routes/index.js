@@ -140,7 +140,7 @@ const {
     deleteCourseSale
 } = require('../Controller/CoursesSells/courseSalesController');
 
-const {   createClass, updateClasses, getOnlineClasses,deleteClasses } = require('../Controller/ClassesOnline/ClassesOnlineController');
+const {   createClass, updateClasses, getOnlineClasses,deleteClasses ,applyForClass, approveApplicant} = require('../Controller/ClassesOnline/ClassesOnlineController');
 
 
 // User routes
@@ -174,12 +174,15 @@ routes.post(
     [authenticateJWT, authorizeRole(["admin"])],
     deleteProject
   );
-  
-// Classes routes
-routes.post('/OnlineClasses',  createClass); // Create a new course
-routes.put('/OnlineClasses/:id', updateClasses); 
-routes.get('/OnlineClasses', getOnlineClasses); 
-routes.delete('/OnlineClasses/:id',deleteClasses);
+
+
+routes.post('/OnlineClasses', createClass); // Create a new course
+routes.put('/OnlineClasses/:id', updateClasses); // Update a course
+routes.get('/OnlineClasses', getOnlineClasses); // Get all courses
+routes.delete('/OnlineClasses/:id', deleteClasses); // Delete a course
+routes.post('/apply', applyForClass); // Apply for a class
+routes.put('/approve-applicant/:id', approveApplicant); 
+
 
 // Roadmap routes
 routes.post(
@@ -330,14 +333,12 @@ routes.get('/hire-from-us/:id', getHireTalentFromUsById);
 routes.put('/hire-from-us/:id', updateHireTalentFromUs);
 routes.delete('/hire-from-us/:id', deleteHireTalentFromUs);
 
-// Task CRUD routes
-routes.post('/tasks', createTask);
-routes.get('/tasks', getAllTasks);
-routes.get('/tasks/:id', getTaskById);
-routes.put('/tasks/:id', updateTask);
-routes.delete('/tasks/:id', deleteTask);
 
-
+  routes.post('/tasks', createTask);
+  routes.get('/tasks', getAllTasks);
+  routes.get('/tasks/:id', getTaskById);
+  routes.put('/tasks/:id', updateTask);
+  routes.delete('/tasks/:id', deleteTask);
 // Course sale routes
 routes.post('/courses/sales', createCourseSale);
 routes.get('/courses/sales',  getAllCourseSales);
