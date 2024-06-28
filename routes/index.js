@@ -67,6 +67,13 @@ const {
     updateProjectProgress,
     deleteProjectProgress
 } = require('../Controller/projectProgressController/projectProgresController');
+const {
+  createEvent,
+  getAllEvents,
+  getEventById,
+  updateEvent,
+  deleteEvent,
+} = require('../Controller/Event/EventController');
 
 // Roadmap Progress CRUD
 const {
@@ -141,7 +148,7 @@ const {
 } = require('../Controller/CoursesSells/courseSalesController');
 
 const {   createClass, updateClasses, getOnlineClasses,deleteClasses } = require('../Controller/ClassesOnline/ClassesOnlineController');
-
+const {getNotificationsByUser , markNotificationAsRead} = require('../Controller/NotificationController/NotificationController')
 
 // User routes
 
@@ -262,6 +269,14 @@ routes.put(
 );
 routes.delete("/project-applicants/:id", deleteProjectApplicant);
 
+
+//Event 
+routes.post('/events', createEvent);
+routes.get('/events', getAllEvents);
+routes.get('/events/:id', getEventById);
+routes.put('/events/:id', updateEvent);
+routes.delete('/events/:id', deleteEvent);
+
 // Project progress routes
 
 routes.post(
@@ -331,6 +346,10 @@ routes.get('/hire-from-us/:id', getHireTalentFromUsById);
 routes.put('/hire-from-us/:id', updateHireTalentFromUs);
 routes.delete('/hire-from-us/:id', deleteHireTalentFromUs);
 
+
+routes.get("/notifications/:userId", getNotificationsByUser);
+
+routes.put("/notifications/:notificationId", markNotificationAsRead);
 // Task CRUD routes
 routes.post('/tasks', createTask);
 routes.get('/tasks', getAllTasks);

@@ -8,6 +8,8 @@ const HireFromUsSchema = new mongoose.Schema({
   organization: { type: String, required: true },
   hiringFor: { type: String, required: true },
   message: { type: String, required: true },
+  status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" }, // Add status field
+  userId: { type: mongoose.Schema.Types.ObjectId, required: true }, // Example for user reference
 });
 
 module.exports = mongoose.model("HireFromUs", HireFromUsSchema);
