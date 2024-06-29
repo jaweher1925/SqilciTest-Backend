@@ -3,10 +3,10 @@ const Classes = require('../../model/ClasseOnlineModel');
 module.exports = {
   createClass: async (req, res) => {
     try {
-      const { title, progress, duration, mentorId, studentIds, price, description } = req.body;
+      const { title, progress, duration, StartDate, mentorId, studentIds, price, description } = req.body;
 
       // Validate input
-      if (!title || !duration || !mentorId || !studentIds || !price || !description) {
+      if (!title || !duration || !StartDate || !mentorId || !studentIds || !price || !description) {
         return res.status(400).json({ success: false, message: 'Invalid input data' });
       }
 
@@ -14,6 +14,7 @@ module.exports = {
         title,
         progress: progress || 0,
         duration,
+        StartDate,
         mentorId,
         studentIds,
         price,
@@ -110,12 +111,12 @@ deleteClasses: async function (req, res) {
 updateClasses: async function (req, res) {
   try {
     const classId = req.params.id;
-    const { title, duration, mentorId, price, description } = req.body;
+    const { title, duration,StartDate, mentorId, price, description } = req.body;
 
     // Find the class by ID and update its properties
     const updatedClass = await Classes.findByIdAndUpdate(
       classId,
-      { title, duration, mentorId, price, description },
+      { title, duration,StartDate, mentorId, price, description },
       { new: true } // Return the updated document
     );
 

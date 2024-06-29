@@ -92,6 +92,16 @@ module.exports = {
     },
   ],
  
+  getStudent:async (req,res)=>{
+    try {
+      const students = await User.find({ role: "student" });
+      res.status(200).json({ data: students });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+  
+ 
   getPortfolio: async (req, res) => {
     try {
       const user = await user.findById(req.params.userId)

@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, getUsers, logoutUser, getUser } = require('../Controller/userController');
+const { registerUser, loginUser, getUsers, logoutUser, getUser ,getStudents} = require('../Controller/userController');
 const { UserRegistryValidate, userLoginValidate } = require('../utils/userValidate');
 const { ensureAuthenticated } = require('../utils/auth');
 const { authenticateJWT, authorizeRole } = require("../utils/auth");
@@ -147,7 +147,7 @@ const {
     deleteCourseSale
 } = require('../Controller/CoursesSells/courseSalesController');
 
-const {   createClass, updateClasses, getOnlineClasses,deleteClasses } = require('../Controller/ClassesOnline/ClassesOnlineController');
+const { createClass, updateClasses, getOnlineClasses,deleteClasses } = require('../Controller/ClassesOnline/ClassesOnlineController');
 const {getNotificationsByUser , markNotificationAsRead} = require('../Controller/NotificationController/NotificationController')
 
 // User routes
@@ -157,6 +157,9 @@ routes.post("/login", userLoginValidate, loginUser);
 routes.post("/logout", authenticateJWT, logoutUser);
 routes.get("/users", [authenticateJWT, authorizeRole(["admin"])], getUsers);
 routes.get("/user", authenticateJWT, getUser);
+
+
+
 
 
 // Project routes

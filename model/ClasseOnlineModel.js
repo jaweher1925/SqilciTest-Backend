@@ -6,8 +6,12 @@ const ClassesSchema = new mongoose.Schema({
     required: true,
   },
   duration: {
-    type: String,
-    required: true,
+    type:  Number,
+    default: 0,
+  },
+  StartDate:{
+    type: Date,
+
   },
   progress: {
     type: Number,
