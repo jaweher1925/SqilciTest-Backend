@@ -66,16 +66,19 @@ module.exports = {
         .json({ message: "Failed to logout user", error: err.message });
     }
   },
-  getUser:async (req, res) => {
-  try {
-    const user = await UserModel.findById(req.user._id).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
+  getUser: async (req, res) => {
+    try {
+      const user = await UserModel.findById(req.user._id).select("-password");
+      if (!user) {
+        return res.status(404).json({ message: "User not found." });
+      }
+      return res.status(200).json({ user });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ message: "Failed to fetch user.", error: err.message });
     }
-    return res.status(200).json({ user });
-  } catch (err) {
-    return res.status(500).json({ message: "Failed to fetch user.", error: err.message });
-  }},
+  },
 
   getUsers: [
     authenticateJWT,
@@ -104,20 +107,21 @@ module.exports = {
  
   getPortfolio: async (req, res) => {
     try {
-      const user = await user.findById(req.params.userId)
-        .populate('portfolios')
-        .populate('enrolledRoadmaps')
-        .populate('enrolledProjects')
-        .populate('enrolledClasses');
+      const user = await user
+        .findById(req.params.userId)
+        .populate("portfolios")
+        .populate("enrolledRoadmaps")
+        .populate("enrolledProjects")
+        .populate("enrolledClasses");
       if (!user) {
-        return res.status(404).send('User not found');
+        return res.status(404).send("User not found");
       }
       res.json(user);
     } catch (error) {
       res.status(500).send(error);
     }
   },
-  
+
   // Update user profile
   put: async (req, res) => {
     try {
@@ -130,5 +134,59 @@ module.exports = {
     } catch (error) {
       res.status(500).send(error);
     }
-  }
+  },
+  patchEnrolledClasses: [
+    authenticateJWT,
+    async (req, res) => {
+      try {
+        const { userId } = req.params;
+        const { classId } = req.body;
+
+        if (!classId) {
+          return res.status(400).json({ message: "Class ID is required" });
+        }
+
+        const updatedUser = await UserModel.findByIdAndUpdate(
+          userId,
+          { $addToSet: { enrolledClasses: classId } },
+          { new: true, runValidators: true }
+        );
+
+        if (!updatedUser) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({
+          message: "Enrolled classes updated successfully",
+          data: updatedUser,
+        });
+      } catch (error) {
+        console.error("Error updating enrolled classes:", error);
+        res.status(500).json({
+          message: "Failed to update enrolled classes",
+          error: error.message,
+        });
+      }
+    },
+  ],
+  countStudents: [
+    authenticateJWT,
+    authorizeRole(["admin", "mentor"]),
+    async (req, res) => {
+      try {
+        const studentCount = await UserModel.countDocuments({
+          role: "student",
+        });
+        return res.status(200).json({
+          message: "Student count retrieved successfully",
+          count: studentCount,
+        });
+      } catch (err) {
+        return res.status(500).json({
+          message: "Failed to count students",
+          error: err.message,
+        });
+      }
+    },
+  ],
 };

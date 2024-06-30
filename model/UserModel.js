@@ -3,7 +3,6 @@ const Schema = mongoose.Schema;
 const RoadmapProgress = require("./roadMapProgress");
 const ProjectProgress = require("./projectProgress");
 
-
 const PortfolioSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "users" },
   title: String,
@@ -21,7 +20,6 @@ const PortfolioSchema = new Schema({
   createdAt: Date,
   updatedAt: Date,
 });
-
 
 const UserSchema = new Schema({
   first_name: { type: String, required: true },

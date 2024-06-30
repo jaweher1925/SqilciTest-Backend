@@ -20,7 +20,8 @@ const {
     getProjectsId,
     updateProject,
     deleteProject,
-    createBulkProject
+    createBulkProject,
+    patchProjectStudents
 } = require('../Controller/projectController/project');
 
 const {
@@ -34,12 +35,13 @@ const {
 
 //Mentors CRUD
 const {
-    createMentor,
-    getAllMentors,
-    getMentorById,
-    updateMentor,
-    deleteMentor
-} = require('../Controller/mentorsController/mentorsController');
+  createMentor,
+  getAllMentors,
+  getMentorById,
+  updateMentor,
+  deleteMentor,
+  patchEnrolledClassesMentors,
+} = require("../Controller/mentorsController/mentorsController");
 
 // MentorsRequests CRUD
 const {
@@ -185,10 +187,17 @@ routes.post(
     [authenticateJWT, authorizeRole(["admin"])],
     deleteProject
   );
+  routes.patch(
+    "/projects/:id/students",
+    [authenticateJWT, authorizeRole(["admin"])],
+    patchProjectStudents
+  );
   
 // Classes routes
 routes.post('/OnlineClasses',  createClass); // Create a new course
 routes.put('/OnlineClasses/:id', updateClasses); 
+routes.get("/OnlineClasses/:id", getClass); 
+
 routes.get('/OnlineClasses', getOnlineClasses); 
 routes.delete('/OnlineClasses/:id',deleteClasses);
 
@@ -224,7 +233,7 @@ routes.post(
   );
   routes.get("/mentors", getAllMentors);
   routes.get("/mentors/:id", getMentorById);
-  routes.put(
+  routes.patch(
     "/mentors/:id",
     [authenticateJWT, authorizeRole(["admin"])],
     MentorValidation,
@@ -240,7 +249,7 @@ routes.post(
 
 routes.post(
     "/mentorship-requests",
-    [authenticateJWT, authorizeRole(["admin"])],
+    [authenticateJWT, authorizeRole(["student"])],
     createMentorshipRequest
   );
   routes.get("/mentorship-requests", getAllMentorshipRequests);
@@ -364,5 +373,13 @@ routes.delete('/tasks/:id', deleteTask);
 // Course sale routes
 routes.post('/courses/sales', createCourseSale);
 routes.get('/courses/sales',  getAllCourseSales);
+
+//adding classes to mentors
+routes.patch(
+  "/user/:userId/enrolledClasses",
+  patchEnrolledClasses
+);
+routes.patch("/mentors/:mentorId/enrolledClasses", patchEnrolledClassesMentors);
+routes.get("/count-students", countStudents);
 
 module.exports = routes;

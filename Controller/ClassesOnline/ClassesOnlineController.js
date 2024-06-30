@@ -18,13 +18,15 @@ module.exports = {
         mentorId,
         studentIds,
         price,
-        description
+        description,
       });
 
       const savedClass = await newClass.save();
       return res.status(201).json({ success: true, data: savedClass });
     } catch (err) {
-      return res.status(500).json({ success: false, message: 'Server error', error: err.message });
+      return res
+        .status(500)
+        .json({ success: false, message: "Server error", error: err.message });
     }
   },
 
@@ -38,7 +40,7 @@ module.exports = {
       if (!course) {
         return res.status(404).json({
           success: false,
-          message: 'Class not found',
+          message: "Class not found",
         });
       }
 
@@ -71,7 +73,9 @@ module.exports = {
       const onlineClasses = await Classes.find(); // Fetch all online classes
 
       if (!onlineClasses || onlineClasses.length === 0) {
-        return res.status(404).json({ success: false, message: 'No online classes found' });
+        return res
+          .status(404)
+          .json({ success: false, message: "No online classes found" });
       }
 
       return res.status(200).json({ success: true, data: onlineClasses });
@@ -80,33 +84,31 @@ module.exports = {
     }
   },
 
+  deleteClasses: async function (req, res) {
+    try {
+      const classId = req.params.id;
 
-deleteClasses: async function (req, res) {
-  try {
-    const classId = req.params.id;
+      // Find the class by ID and delete it
+      const deletedClass = await Classes.findByIdAndDelete(classId);
 
-    // Find the class by ID and delete it
-    const deletedClass = await Classes.findByIdAndDelete(classId);
+      if (!deletedClass) {
+        return res.status(404).json({
+          success: false,
+          message: "Class not found",
+        });
+      }
 
-    if (!deletedClass) {
-      return res.status(404).json({
+      return res.status(200).json({
+        success: true,
+        data: deletedClass,
+      });
+    } catch (err) {
+      return res.status(500).json({
         success: false,
-        message: 'Class not found',
+        error: err.message,
       });
     }
-
-    return res.status(200).json({
-      success: true,
-      data: deletedClass,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      error: err.message,
-    });
-  }
-
-},
+  },
 
 updateClasses: async function (req, res) {
   try {
@@ -120,24 +122,37 @@ updateClasses: async function (req, res) {
       { new: true } // Return the updated document
     );
 
-    if (!updatedClass) {
-      return res.status(404).json({
+      if (!updatedClass) {
+        return res.status(404).json({
+          success: false,
+          message: "Class not found",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: updatedClass,
+      });
+    } catch (err) {
+      return res.status(500).json({
         success: false,
-        message: 'Class not found',
+        error: err.message,
       });
     }
+  },
+  getClass: async (req, res) => {
+    try {
+      const onlineClasses = await Classes.findById(req.params.id)
 
-    return res.status(200).json({
-      success: true,
-      data: updatedClass,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      error: err.message,
-    });
-  }
-},
+      if (!onlineClasses || onlineClasses.length === 0) {
+        return res
+          .status(404)
+          .json({ success: false, message: "No online classes found" });
+      }
 
-
-}
+      return res.status(200).json({ success: true, data: onlineClasses });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
+  },
+};
