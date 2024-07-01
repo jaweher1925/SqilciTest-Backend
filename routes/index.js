@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, getUsers, logoutUser, getUser ,getStudents, patchEnrolledClasses, countStudents} = require('../Controller/userController');
+const { registerUser, loginUser, getUsers, logoutUser, getUser ,getStudents, patchEnrolledClasses, countStudents, patchEnrolledProjects} = require('../Controller/userController');
 const { UserRegistryValidate, userLoginValidate } = require('../utils/userValidate');
 const { ensureAuthenticated } = require('../utils/auth');
 const { authenticateJWT, authorizeRole } = require("../utils/auth");
@@ -128,7 +128,9 @@ const {
     getAllHireTalentsFromUs,
     getHireTalentFromUsById,
     updateHireTalentFromUs,
-    deleteHireTalentFromUs
+    deleteHireTalentFromUs,
+    approveHireTalent,
+    rejectHireTalent
 } = require('../Controller/hireFromUs/hireFromUsController');
 
 // Task CRUD
@@ -152,6 +154,7 @@ const {
 const { createClass, updateClasses, getOnlineClasses,deleteClasses, getClass } = require('../Controller/ClassesOnline/ClassesOnlineController');
 const {getNotificationsByUser , markNotificationAsRead} = require('../Controller/NotificationController/NotificationController')
 
+
 // User routes
 
 routes.post("/register", UserRegistryValidate, registerUser);
@@ -162,8 +165,22 @@ routes.get("/user", authenticateJWT, getUser);
 
 
 
+// Notification routes
+routes.post('/send-notification/:userId', async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const { message } = req.body;
+        const type = 'hire-talent'; // You can make this dynamic if needed
+        const notification = await createNotification(userId, message, type);
+        res.status(201).json(notification);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
+routes.get('/notifications/:userId', [authenticateJWT], getNotificationsByUser);
 
+routes.put('/notifications/:notificationId', [authenticateJWT], markNotificationAsRead);
 // Project routes
 routes.post(
     "/projects",
@@ -357,6 +374,8 @@ routes.get('/hire-from-us', getAllHireTalentsFromUs);
 routes.get('/hire-from-us/:id', getHireTalentFromUsById);
 routes.put('/hire-from-us/:id', updateHireTalentFromUs);
 routes.delete('/hire-from-us/:id', deleteHireTalentFromUs);
+routes.put('/hire-from-us/approve/:id', approveHireTalent);
+routes.put('/hire-from-us/reject/:id', rejectHireTalent);
 
 
 routes.get("/notifications/:userId", getNotificationsByUser);
@@ -381,5 +400,5 @@ routes.patch(
 );
 routes.patch("/mentors/:mentorId/enrolledClasses", patchEnrolledClassesMentors);
 routes.get("/count-students", countStudents);
-
+routes.patch("/user/:userId/enrolledProjects", patchEnrolledProjects);
 module.exports = routes;

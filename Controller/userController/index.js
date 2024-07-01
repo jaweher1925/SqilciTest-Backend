@@ -94,8 +94,8 @@ module.exports = {
       }
     },
   ],
- 
-  getStudent:async (req,res)=>{
+
+  getStudent: async (req, res) => {
     try {
       const students = await User.find({ role: "student" });
       res.status(200).json({ data: students });
@@ -103,8 +103,7 @@ module.exports = {
       res.status(500).json({ error: error.message });
     }
   },
-  
- 
+
   getPortfolio: async (req, res) => {
     try {
       const user = await user
@@ -164,6 +163,40 @@ module.exports = {
         console.error("Error updating enrolled classes:", error);
         res.status(500).json({
           message: "Failed to update enrolled classes",
+          error: error.message,
+        });
+      }
+    },
+  ],
+  patchEnrolledProjects: [
+    authenticateJWT,
+    async (req, res) => {
+      try {
+        const { userId } = req.params;
+        const { projectId } = req.body;
+
+        if (!projectId) {
+          return res.status(400).json({ message: "Project ID is required" });
+        }
+
+        const updatedUser = await UserModel.findByIdAndUpdate(
+          userId,
+          { $addToSet: { enrolledProjects: projectId } },
+          { new: true, runValidators: true }
+        );
+
+        if (!updatedUser) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({
+          message: "Enrolled projects updated successfully",
+          data: updatedUser,
+        });
+      } catch (error) {
+        console.error("Error updating enrolled projects:", error);
+        res.status(500).json({
+          message: "Failed to update enrolled projects",
           error: error.message,
         });
       }

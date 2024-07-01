@@ -1,4 +1,6 @@
+const { default: axios } = require("axios");
 const HireTalent = require("../../model/HireFromUsModel");
+const { createNotification } = require("../NotificationController/NotificationController");
 
 module.exports = {
   createHireTalentFromUs: async (req, res) => {
@@ -16,7 +18,9 @@ module.exports = {
       const hiretalentsfromus = await HireTalent.find();
       res.json(hiretalentsfromus);
     } catch (error) {
-      res.status(500).json({ error: "Failed to retrieve hire talents from us" });
+      res
+        .status(500)
+        .json({ error: "Failed to retrieve hire talents from us" });
     }
   },
 
@@ -50,7 +54,9 @@ module.exports = {
 
   deleteHireTalentFromUs: async (req, res) => {
     try {
-      const hiretalentfromus = await HireTalent.findByIdAndDelete(req.params.id);
+      const hiretalentfromus = await HireTalent.findByIdAndDelete(
+        req.params.id
+      );
       if (!hiretalentfromus) {
         return res.status(404).json({ error: "Hire talent from us not found" });
       }
@@ -64,20 +70,18 @@ module.exports = {
     try {
       const hireTalent = await HireTalent.findByIdAndUpdate(
         req.params.id,
-        { status: "approved" }, // Assuming 'status' is a field in your model to track approval status
+        { status: "approved" },
         { new: true }
       );
-
       if (!hireTalent) {
         return res.status(404).json({ error: "HireTalent not found" });
       }
-
-      // Send notification to user who submitted the idea (example using Axios)
-      const userId = hireTalent.userId; // Adjust according to your model structure
-      await axios.post(`http://localhost:5000/api/send-notification/${userId}`, {
-        message: "Your hiring talent request has been approved.",
-      });
-
+      // Create notification
+      await createNotification(
+        hireTalent.userId,
+        "Your hiring talent request has been approved.",
+        "hire-talent"
+      );
       res.json(hireTalent);
     } catch (error) {
       console.error("Error approving hire talent:", error);
@@ -89,20 +93,18 @@ module.exports = {
     try {
       const hireTalent = await HireTalent.findByIdAndUpdate(
         req.params.id,
-        { status: "rejected" }, // Assuming 'status' is a field in your model to track rejection status
+        { status: "rejected" },
         { new: true }
       );
-
       if (!hireTalent) {
         return res.status(404).json({ error: "HireTalent not found" });
       }
-
-      // Send notification to user who submitted the idea (example using Axios)
-      const userId = hireTalent.userId; // Adjust according to your model structure
-      await axios.post(`http://localhost:5000/api/send-notification/${userId}`, {
-        message: "Your hiring talent request has been rejected.",
-      });
-
+      // Create notification
+      await createNotification(
+        hireTalent.userId,
+        "Your hiring talent request has been rejected.",
+        "hire-talent"
+      );
       res.json(hireTalent);
     } catch (error) {
       console.error("Error rejecting hire talent:", error);
