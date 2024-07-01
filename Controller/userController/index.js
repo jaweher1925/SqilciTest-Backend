@@ -130,5 +130,23 @@ module.exports = {
     } catch (error) {
       res.status(500).send(error);
     }
-  }
+  },
+  approveUser: async (req, res) => {
+    const { userId } = req.params;
+    try {
+      // Approve the user (e.g., update the user's status in the database)
+      const user = await UserModel.findByIdAndUpdate(
+        userId,
+        { status: 'approved' },
+        { new: true }
+      );
+
+      // Send a notification to the user
+      await createNotification(user._id, 'Your application has been approved!', 'approval');
+
+      res.status(200).json({ success: true, user });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  },
 };

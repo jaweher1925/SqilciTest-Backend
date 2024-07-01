@@ -13,7 +13,7 @@ module.exports = {
       const newClass = new Classes({
         title,
         progress: progress || 0,
-        duration,
+        duration:0,
         StartDate,
         mentorId,
         studentIds,
