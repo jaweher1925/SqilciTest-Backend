@@ -104,34 +104,31 @@ module.exports = {
     }
   },
 
-  getPortfolio: async (req, res) => {
+  getUserProfile: async (req, res) => {
     try {
-      const user = await user
-        .findById(req.params.userId)
-        .populate("portfolios")
-        .populate("enrolledRoadmaps")
-        .populate("enrolledProjects")
-        .populate("enrolledClasses");
+      console.log("Fetching profile for user ID:", req.params.userId); // Debugging log
+
+      const user = await UserModel.findById(req.params.userId).select("-password");
       if (!user) {
-        return res.status(404).send("User not found");
+        return res.status(404).json({ message: "User not found" });
       }
-      res.json(user);
+      res.status(200).json({ user });
     } catch (error) {
-      res.status(500).send(error);
+      console.error("Error fetching user profile:", error);  // Add logging for debugging
+      res.status(500).json({ message: "Failed to fetch user profile", error: error.message });
     }
   },
 
-  // Update user profile
-  put: async (req, res) => {
+
+ updateUserProfile : async (req, res) => {
     try {
-      const updatedUser = await user.findByIdAndUpdate(
-        req.params.userId,
-        { $set: req.body },
-        { new: true }
-      );
-      res.json(updatedUser);
+      const user = await UserModel.findByIdAndUpdate(req.params.userId, req.body, { new: true });
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.json(user);
     } catch (error) {
-      res.status(500).send(error);
+      res.status(500).json({ message: error.message });
     }
   },
   patchEnrolledClasses: [

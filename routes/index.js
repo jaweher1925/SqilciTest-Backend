@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, getUsers, logoutUser, getUser ,getStudents, patchEnrolledClasses, countStudents, patchEnrolledProjects} = require('../Controller/userController');
+const { registerUser, loginUser, getUsers, logoutUser, getUser ,getStudents,getUserProfile,updateUserProfile, patchEnrolledClasses, countStudents, patchEnrolledProjects} = require('../Controller/userController');
 const { UserRegistryValidate, userLoginValidate } = require('../utils/userValidate');
 const { ensureAuthenticated } = require('../utils/auth');
 const { authenticateJWT, authorizeRole } = require("../utils/auth");
@@ -163,6 +163,8 @@ routes.post("/logout", authenticateJWT, logoutUser);
 routes.get("/users", [authenticateJWT, authorizeRole(["admin"])], getUsers);
 routes.get("/user", authenticateJWT, getUser);
 
+routes.get('/:userId', authenticateJWT,  getUserProfile);
+routes.put('/:userId', authenticateJWT, updateUserProfile);
 
 
 // Notification routes
@@ -401,4 +403,7 @@ routes.patch(
 routes.patch("/mentors/:mentorId/enrolledClasses", patchEnrolledClassesMentors);
 routes.get("/count-students", countStudents);
 routes.patch("/user/:userId/enrolledProjects", patchEnrolledProjects);
+
+
+
 module.exports = routes;

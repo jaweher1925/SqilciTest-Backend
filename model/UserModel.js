@@ -29,7 +29,7 @@ const UserSchema = new Schema({
   phone: { type: Number, required: true },
   role: {
     type: String,
-    enum: ["admin", "mentor", "student"],
+    enum: ["admin", "mentor", "student","Entreprenur"],
     default: "student",
   },
   portfolios: [{ type: Schema.Types.ObjectId, ref: "Portfolio" }],
