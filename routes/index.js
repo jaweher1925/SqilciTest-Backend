@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, getUsers, logoutUser, getUser ,getStudents, patchEnrolledClasses, countStudents, patchEnrolledProjects} = require('../Controller/userController');
+const { registerUser, loginUser, getUsers, logoutUser, getUser ,getStudents, patchEnrolledClasses, countStudents, patchEnrolledProjects, getUserProfile, updateUserProfile} = require('../Controller/userController');
 const { UserRegistryValidate, userLoginValidate } = require('../utils/userValidate');
 const { ensureAuthenticated } = require('../utils/auth');
 const { authenticateJWT, authorizeRole } = require("../utils/auth");
@@ -163,6 +163,9 @@ routes.post("/logout", authenticateJWT, logoutUser);
 routes.get("/users", [authenticateJWT, authorizeRole(["admin"])], getUsers);
 routes.get("/user", authenticateJWT, getUser);
 
+//user profile
+routes.get("/user/:userId/profile", getUserProfile);
+routes.put("/user/:userId/profile", updateUserProfile);
 
 
 // Notification routes

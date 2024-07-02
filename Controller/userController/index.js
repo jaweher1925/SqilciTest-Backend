@@ -2,6 +2,7 @@ const UserModel = require("../../model/UserModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { authenticateJWT, authorizeRole } = require("../../utils/auth");
+const { default: mongoose } = require("mongoose");
 
 module.exports = {
   registerUser: async (req, res) => {
@@ -175,8 +176,17 @@ module.exports = {
         const { userId } = req.params;
         const { projectId } = req.body;
 
+        if (!userId || userId === "undefined") {
+          return res.status(400).json({ message: "Valid User ID is required" });
+        }
+
         if (!projectId) {
           return res.status(400).json({ message: "Project ID is required" });
+        }
+
+        // Validate that userId is a valid ObjectId
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+          return res.status(400).json({ message: "Invalid User ID format" });
         }
 
         const updatedUser = await UserModel.findByIdAndUpdate(
@@ -218,6 +228,79 @@ module.exports = {
         return res.status(500).json({
           message: "Failed to count students",
           error: err.message,
+        });
+      }
+    },
+  ],
+  getUserProfile: [
+    authenticateJWT,
+    async (req, res) => {
+      try {
+        const { userId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+          return res.status(400).json({ message: "Invalid User ID format" });
+        }
+
+        const user = await UserModel.findById(userId)
+          .select("-password")
+          .populate("enrolledClasses")
+          .populate("enrolledProjects")
+          .populate("enrolledRoadmaps")
+          .populate("portfolios");
+
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({
+          message: "User profile retrieved successfully",
+          data: user,
+        });
+      } catch (error) {
+        console.error("Error retrieving user profile:", error);
+        res.status(500).json({
+          message: "Failed to retrieve user profile",
+          error: error.message,
+        });
+      }
+    },
+  ],
+
+  updateUserProfile: [
+    authenticateJWT,
+    async (req, res) => {
+      try {
+        const { userId } = req.params;
+        const updateData = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+          return res.status(400).json({ message: "Invalid User ID format" });
+        }
+
+        // Remove sensitive fields from updateData
+        delete updateData.password;
+        delete updateData.role;
+
+        const updatedUser = await UserModel.findByIdAndUpdate(
+          userId,
+          { $set: updateData },
+          { new: true, runValidators: true }
+        ).select("-password");
+
+        if (!updatedUser) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({
+          message: "User profile updated successfully",
+          data: updatedUser,
+        });
+      } catch (error) {
+        console.error("Error updating user profile:", error);
+        res.status(500).json({
+          message: "Failed to update user profile",
+          error: error.message,
         });
       }
     },

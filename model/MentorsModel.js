@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const MentorSchema = new Schema({
@@ -49,8 +49,8 @@ const MentorSchema = new Schema({
     twitter: String,
     github: String,
   },
-  enrolledProjects: [{ type: Schema.Types.ObjectId, ref: "ProjectProgress" }],
-  enrolledClasses: [{ type: Schema.Types.ObjectId, ref: "classesProgress" }],
+  enrolledProjects: [{ type: Schema.Types.ObjectId }],
+  enrolledClasses: [{ type: Schema.Types.ObjectId }],
   expertise_areas: {
     type: [String],
     required: true,
@@ -66,6 +66,6 @@ const MentorSchema = new Schema({
   },
 });
 
-const MentorModel = mongoose.model('mentors', MentorSchema);
+const MentorModel = mongoose.model("mentors", MentorSchema);
 
 module.exports = MentorModel;
