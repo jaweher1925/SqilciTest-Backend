@@ -33,9 +33,7 @@ const ClassesSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  notification:{
-    type: [Object],
-  }
+  
   
 });
 

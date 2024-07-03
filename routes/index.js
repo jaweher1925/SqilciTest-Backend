@@ -309,6 +309,8 @@ routes.get('/events/:id', getEventById);
 routes.put('/events/:id', updateEvent);
 routes.delete('/events/:id', deleteEvent);
 
+
+
 // Project progress routes
 
 routes.post(
