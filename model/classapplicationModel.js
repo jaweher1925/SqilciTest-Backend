@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-
 
 const classApplicationSchema = new mongoose.Schema({
   Name: {
@@ -13,13 +12,16 @@ const classApplicationSchema = new mongoose.Schema({
   },
   classId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Classes',
+    required: true,
+  },
+  studentId: {
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
   status: {
     type: String,
-    enum: ['Pending', 'Approved', 'Rejected'],
-    default: 'Pending',
+    enum: ["Pending", "Approved", "Rejected"],
+    default: "Pending",
   },
   appliedAt: {
     type: Date,
@@ -27,4 +29,4 @@ const classApplicationSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('ClassApplication', classApplicationSchema);
+module.exports = mongoose.model("ClassApplication", classApplicationSchema);

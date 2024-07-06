@@ -3,17 +3,36 @@ const Classes = require('../../model/ClasseOnlineModel');
 module.exports = {
   createClass: async (req, res) => {
     try {
-      const { title, progress, duration, StartDate, mentorId, studentIds, price, description } = req.body;
+      const {
+        title,
+        progress,
+        duration,
+        StartDate,
+        mentorId,
+        studentIds,
+        price,
+        description,
+      } = req.body;
 
       // Validate input
-      if (!title || !duration || !StartDate || !mentorId || !studentIds || !price || !description) {
-        return res.status(400).json({ success: false, message: 'Invalid input data' });
+      if (
+        !title ||
+        !duration ||
+        !StartDate ||
+        !mentorId ||
+        !studentIds ||
+        !price ||
+        !description
+      ) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid input data" });
       }
 
       const newClass = new Classes({
         title,
         progress: progress || 0,
-        duration:0,
+        duration: 0,
         StartDate,
         mentorId,
         studentIds,
@@ -38,7 +57,9 @@ module.exports = {
       const course = await Classes.findById(courseId);
 
       if (!course) {
-        return res.status(404).json({ success: false, message: 'Class not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: "Class not found" });
       }
 
       // Calculate progress based on time intervals (e.g., weeks)
@@ -101,17 +122,18 @@ module.exports = {
     }
   },
 
-updateClasses: async function (req, res) {
-  try {
-    const classId = req.params.id;
-    const { title, duration,StartDate, mentorId, price, description } = req.body;
+  updateClasses: async function (req, res) {
+    try {
+      const classId = req.params.id;
+      const { title, duration, StartDate, mentorId, price, description } =
+        req.body;
 
-    // Find the class by ID and update its properties
-    const updatedClass = await Classes.findByIdAndUpdate(
-      classId,
-      { title, duration,StartDate, mentorId, price, description },
-      { new: true } // Return the updated document
-    );
+      // Find the class by ID and update its properties
+      const updatedClass = await Classes.findByIdAndUpdate(
+        classId,
+        { title, duration, StartDate, mentorId, price, description },
+        { new: true } // Return the updated document
+      );
 
       if (!updatedClass) {
         return res.status(404).json({
@@ -133,7 +155,7 @@ updateClasses: async function (req, res) {
   },
   getClass: async (req, res) => {
     try {
-      const onlineClasses = await Classes.findById(req.params.id)
+      const onlineClasses = await Classes.findById(req.params.id);
 
       if (!onlineClasses || onlineClasses.length === 0) {
         return res
@@ -151,12 +173,51 @@ updateClasses: async function (req, res) {
       const onlineClass = await Classes.findById(req.params.id);
 
       if (!onlineClass) {
-        return res.status(404).json({ success: false, message: 'Class not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: "Class not found" });
       }
 
       return res.status(200).json({ success: true, data: onlineClass });
     } catch (error) {
       return res.status(500).json({ success: false, error: error.message });
+    }
+  },
+  addStudentToClass: async function (req, res) {
+    try {
+      const classId = req.params.id;
+      const { studentId } = req.body;
+
+      // Validate input
+      if (!studentId) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Student ID is required" });
+      }
+
+      // Find the class by ID and update it by adding the student ID
+      const updatedClass = await Classes.findByIdAndUpdate(
+        classId,
+        { $addToSet: { studentIds: studentId } }, // $addToSet ensures no duplicates
+        { new: true } // Return the updated document
+      );
+
+      if (!updatedClass) {
+        return res.status(404).json({
+          success: false,
+          message: "Class not found",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: updatedClass,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        error: err.message,
+      });
     }
   },
 };
