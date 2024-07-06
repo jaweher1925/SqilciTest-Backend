@@ -18,13 +18,14 @@ const ClassesSchema = new mongoose.Schema({
     default: 0,
   },
   mentorId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Mentor', 
     required: true,
   },
-  studentIds: {
-    type: [String],
-    default: [],
-  },
+  studentIds: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // assuming you have a User model for students
+  }],
   price: {
     type: Number,
     required: true,

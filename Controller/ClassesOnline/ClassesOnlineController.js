@@ -30,7 +30,7 @@ module.exports = {
     }
   },
 
-  updateClassesProgress: async function (req, res) {
+  updateClassProgress: async (req, res) => {
     try {
       const courseId = req.params.id;
 
@@ -38,17 +38,14 @@ module.exports = {
       const course = await Classes.findById(courseId);
 
       if (!course) {
-        return res.status(404).json({
-          success: false,
-          message: "Class not found",
-        });
+        return res.status(404).json({ success: false, message: 'Class not found' });
       }
 
       // Calculate progress based on time intervals (e.g., weeks)
       const now = new Date();
       const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // Subtract 7 days
 
-      if (new Date(course.date) < oneWeekAgo) {
+      if (new Date(course.StartDate) < oneWeekAgo) {
         // Increment progress by 1 if a week has passed
         course.progress += 1;
 
@@ -56,15 +53,9 @@ module.exports = {
         await course.save();
       }
 
-      return res.status(200).json({
-        success: true,
-        data: course,
-      });
+      return res.status(200).json({ success: true, data: course });
     } catch (err) {
-      return res.status(500).json({
-        success: false,
-        error: err.message,
-      });
+      return res.status(500).json({ success: false, error: err.message });
     }
   },
 
@@ -151,6 +142,19 @@ updateClasses: async function (req, res) {
       }
 
       return res.status(200).json({ success: true, data: onlineClasses });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
+  },
+  getClassById: async (req, res) => {
+    try {
+      const onlineClass = await Classes.findById(req.params.id);
+
+      if (!onlineClass) {
+        return res.status(404).json({ success: false, message: 'Class not found' });
+      }
+
+      return res.status(200).json({ success: true, data: onlineClass });
     } catch (error) {
       return res.status(500).json({ success: false, error: error.message });
     }

@@ -151,7 +151,9 @@ const {
     deleteCourseSale
 } = require('../Controller/CoursesSells/courseSalesController');
 
-const { createClass, updateClasses, getOnlineClasses,deleteClasses, getClass } = require('../Controller/ClassesOnline/ClassesOnlineController');
+const { createClass, updateClasses, getOnlineClasses,deleteClasses, getClass,updateClassProgress } = require('../Controller/ClassesOnline/ClassesOnlineController');
+const { createClassApplicant,getAllClassApplicants, getClassApplicantById,updateClassApplicant, deleteClassApplicant} = require('../Controller/classApplicationController/classApplicationController');
+
 const {getNotificationsByUser , markNotificationAsRead} = require('../Controller/NotificationController/NotificationController')
 
 
@@ -217,9 +219,17 @@ routes.post(
 routes.post('/OnlineClasses',  createClass); // Create a new course
 routes.put('/OnlineClasses/:id', updateClasses); 
 routes.get("/OnlineClasses/:id", getClass); 
+routes.patch('/classes/:id/progress', updateClassProgress); // Assuming this is a PATCH request
 
 routes.get('/OnlineClasses', getOnlineClasses); 
 routes.delete('/OnlineClasses/:id',deleteClasses);
+
+//class application routes 
+routes.post('/class-applications', createClassApplicant);
+routes.get('/class-applications',getAllClassApplicants);
+routes.get('/class-applications/:id',getClassApplicantById);
+routes.put('/class-applications/:id',updateClassApplicant);
+routes.delete('/class-applications/:id',deleteClassApplicant);
 
 // Roadmap routes
 routes.post(
