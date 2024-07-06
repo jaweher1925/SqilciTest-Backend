@@ -220,7 +220,6 @@ routes.post('/OnlineClasses',  createClass); // Create a new course
 routes.put('/OnlineClasses/:id', updateClasses); 
 routes.get("/OnlineClasses/:id", getClass); 
 routes.patch('/classes/:id/progress', updateClassProgress); // Assuming this is a PATCH request
-
 routes.get('/OnlineClasses', getOnlineClasses); 
 routes.delete('/OnlineClasses/:id',deleteClasses);
 routes.patch("/classes/:id/add-student", addStudentToClass);
