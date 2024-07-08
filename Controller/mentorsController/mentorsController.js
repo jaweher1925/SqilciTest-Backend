@@ -1,25 +1,27 @@
 const MentorModel = require('../../model/MentorsModel');
 const { authenticateJWT } = require('../../utils/auth');
+const { sendWelcomeEmail, sendEmailToMentor } = require('../../Controller/sendEmailToMentor/sendEmailToMentor'); 
 
 module.exports = {
-  createMentor: async (req, res) => {
-    try {
-      const mentor = new MentorModel(req.body);
-      const savedMentor = await mentor.save();
-      return res.status(201).json({ message: "success", data: savedMentor });
-    } catch (err) {
-      return res.status(500).json({ message: "error", error: err.message });
-    }
-  },
+ 
+ createMentor : async (req, res) => {
+  try {
+    const mentor = new MentorModel(req.body);
+    const savedMentor = await mentor.save();
+    await sendEmailToMentor(savedMentor);
 
+    return res.status(201).json({ message: "Mentor created successfully", data: savedMentor });
+  } catch (error) {
+    console.error("Error creating mentor:", error);
+    return res.status(500).json({ message: "Failed to create mentor", error: error.message });
+  }
+},
   getAllMentors: async (req, res) => {
     try {
       const mentors = await MentorModel.find();
       return res.status(200).json({ data: mentors });
     } catch (err) {
-      return res
-        .status(500)
-        .json({ message: "error no data present", error: err.message });
+      return res.status(500).json({ message: "error", error: err.message });
     }
   },
 
@@ -62,6 +64,7 @@ module.exports = {
       return res.status(500).json({ message: "error", error: err.message });
     }
   },
+
   patchEnrolledClassesMentors: [
     authenticateJWT,
     async (req, res) => {
