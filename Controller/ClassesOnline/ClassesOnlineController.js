@@ -9,7 +9,7 @@ module.exports = {
         duration,
         StartDate,
         mentorId,
-        studentIds,
+      
         price,
         description,
       } = req.body;
@@ -20,7 +20,7 @@ module.exports = {
         !duration ||
         !StartDate ||
         !mentorId ||
-        !studentIds ||
+    
         !price ||
         !description
       ) {
@@ -35,7 +35,7 @@ module.exports = {
         duration: 0,
         StartDate,
         mentorId,
-        studentIds,
+       
         price,
         description,
       });

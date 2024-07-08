@@ -27,6 +27,7 @@ const UserSchema = new Schema({
   email: { type: String, unique: true },
   password: { type: String, required: true },
   phone: { type: Number, required: true },
+  photo:{ type: String, required: true },
   role: {
     type: String,
     enum: ["admin", "mentor", "student","Entreprenur"],
