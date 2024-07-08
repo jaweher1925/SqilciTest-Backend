@@ -118,12 +118,10 @@ module.exports = {
       res.status(200).json({ user });
     } catch (error) {
       console.error("Error fetching user profile:", error); // Add logging for debugging
-      res
-        .status(500)
-        .json({
-          message: "Failed to fetch user profile",
-          error: error.message,
-        });
+      res.status(500).json({
+        message: "Failed to fetch user profile",
+        error: error.message,
+      });
     }
   },
 
