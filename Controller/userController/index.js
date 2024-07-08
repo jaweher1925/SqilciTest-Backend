@@ -109,23 +109,33 @@ module.exports = {
     try {
       console.log("Fetching profile for user ID:", req.params.userId); // Debugging log
 
-      const user = await UserModel.findById(req.params.userId).select("-password");
+      const user = await UserModel.findById(req.params.userId).select(
+        "-password"
+      );
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
       res.status(200).json({ user });
     } catch (error) {
-      console.error("Error fetching user profile:", error);  // Add logging for debugging
-      res.status(500).json({ message: "Failed to fetch user profile", error: error.message });
+      console.error("Error fetching user profile:", error); // Add logging for debugging
+      res
+        .status(500)
+        .json({
+          message: "Failed to fetch user profile",
+          error: error.message,
+        });
     }
   },
 
-
- updateUserProfile : async (req, res) => {
+  updateUserProfile: async (req, res) => {
     try {
-      const user = await UserModel.findByIdAndUpdate(req.params.userId, req.body, { new: true });
+      const user = await UserModel.findByIdAndUpdate(
+        req.params.userId,
+        req.body,
+        { new: true }
+      );
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: "User not found" });
       }
       res.json(user);
     } catch (error) {
@@ -297,6 +307,35 @@ module.exports = {
         console.error("Error updating user profile:", error);
         res.status(500).json({
           message: "Failed to update user profile",
+          error: error.message,
+        });
+      }
+    },
+  ],
+  deleteUser: [
+    authenticateJWT,
+    async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+          return res.status(400).json({ message: "Invalid User ID format" });
+        }
+
+        const deletedUser = await UserModel.findByIdAndDelete(id);
+
+        if (!deletedUser) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({
+          message: "User deleted successfully",
+          data: deletedUser,
+        });
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        res.status(500).json({
+          message: "Failed to delete user",
           error: error.message,
         });
       }
