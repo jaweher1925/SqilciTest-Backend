@@ -278,6 +278,17 @@ routes.post(
     deleteMentor
   );
   
+
+routes.post('/send-email', async (req, res) => {
+    const { mentorEmail, subject, text, html } = req.body;
+  
+    try {
+      const info = await sendEmailToMentor(mentorEmail, subject, text, html);
+      res.status(200).json({ message: 'Email sent successfully', info });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to send email', message: error.message });
+    }
+  });
 // Mentorship request routes
 
 routes.post(
