@@ -1,8 +1,9 @@
 const MentorModel = require('../../model/MentorsModel');
 const { authenticateJWT } = require('../../utils/auth');
 const nodemailer = require('nodemailer');
-
 const dotenv = require('dotenv');
+const crypto = require('crypto');
+const fetch = require('node-fetch'); // Ensure you have node-fetch installed
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
@@ -13,6 +14,10 @@ const transporter = nodemailer.createTransport({
     pass: process.env.MAIL_PASSWORD
   }
 });
+
+function generateRandomPassword(length) {
+  return crypto.randomBytes(length).toString('hex');
+}
 
 module.exports = {
 
@@ -38,18 +43,55 @@ module.exports = {
 
   createMentor: async (req, res) => {
     try {
-      const mentor = new MentorModel(req.body);
+      // Generate a random password for the mentor
+      const password = generateRandomPassword(8);
+
+      // Register the user first
+      const registerResponse = await fetch(
+        "http://localhost:5000/api/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            first_name: req.body.first_name,
+            last_name: req.body.last_name,
+            email: req.body.contact_information.email,
+            password, // Use the generated password
+            phone: req.body.contact_information.phone,
+            role: 'mentor',
+          }),
+        }
+      );
+
+      const registerResponseBody = await registerResponse.json();
+  
+      if (!registerResponse.ok) {
+        console.error('Registration API response:', registerResponseBody);
+        throw new Error('Failed to register user');
+      }
+
+      const registeredUser = registerResponseBody;
+
+      // Create the mentor with the user ID reference
+      const mentorData = {
+        ...req.body,
+        user_id: registeredUser._id,
+        password // Save the password for sending in the email
+      };
+      const mentor = new MentorModel(mentorData);
       const savedMentor = await mentor.save();
 
       // Prepare email details
       const sender = {
         name: 'Admin',
-        address: process.env.MAIL_USER
+        address: process.env.MAIL_USER,
       };
 
       const recipients = [{
         name: savedMentor.name,
-        address: savedMentor.contact_information.email // Assuming the mentor's email is in the savedMentor object
+        address: savedMentor.contact_information.email, // Assuming the mentor's email is in the savedMentor object
       }];
 
       try {
@@ -57,8 +99,15 @@ module.exports = {
           sender,
           recipients,
           subject: 'Welcome to Our Platform',
-          message: `Hello ${savedMentor.name},\n\nWelcome to Sqilco! Your account has been created, and you can log in with the following credentials:\n\nEmail: ${savedMentor.contact_information.email}\nPassword: Password123!`
-        });
+          message: `Hello ${savedMentor.name},<br><br>
+                    Welcome to Sqilco! Your account has been created, and you can log in with the following credentials:<br><br>
+                    Email: ${savedMentor.contact_information.email}<br>
+                    Password: ${password}
+                    <br><br>
+                    Best regards,
+                    Sqilco Team`
+
+                            });
 
         console.log('Email sent:', emailResult);
       } catch (emailError) {
@@ -72,6 +121,8 @@ module.exports = {
       return res.status(500).json({ message: "Failed to create mentor", error: error.message });
     }
   },
+
+
   getAllMentors: async (req, res) => {
     try {
       const mentors = await MentorModel.find();

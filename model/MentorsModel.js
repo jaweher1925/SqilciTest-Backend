@@ -6,7 +6,6 @@ const MentorSchema = new Schema({
     type: String,
     required: true,
   },
-
   designation: {
     type: String,
     required: true,
@@ -20,9 +19,12 @@ const MentorSchema = new Schema({
   contact_information: {
     email: String,
     phone: String,
-    website: String,
   },
-  // Add any other fields you need for your application
+  user_id: { // Reference to User
+    type: Schema.Types.ObjectId,
+    ref: 'users',
+    required: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -34,5 +36,4 @@ const MentorSchema = new Schema({
 });
 
 const MentorModel = mongoose.model("mentors", MentorSchema);
-
 module.exports = MentorModel;
