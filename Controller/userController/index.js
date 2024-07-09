@@ -146,9 +146,7 @@ module.exports = {
       res.status(404).send("Invalid or expired token");
     }
   },
-  getUsers: [
-    authenticateJWT,
-    authorizeRole(["admin", "mentor"]),
+  getUsers: 
     async (req, res) => {
       try {
         const users = await UserModel.find({}, { password: 0 });
@@ -159,7 +157,7 @@ module.exports = {
           .json({ message: "Failed to fetch users", error: err.message });
       }
     },
-  ],
+  
 
   getStudent: async (req, res) => {
     try {
