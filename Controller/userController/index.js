@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { authenticateJWT, authorizeRole } = require("../../utils/auth");
 const { default: mongoose } = require("mongoose");
+const nodemailer = require("nodemailer");
+const axios = require("axios");
 
 module.exports = {
   registerUser: async (req, res) => {
@@ -80,7 +82,70 @@ module.exports = {
         .json({ message: "Failed to fetch user.", error: err.message });
     }
   },
-
+  forgotPassword : async (req, res) => {
+    try {
+      const { email } = req.body;
+      // Check if the email exists in your user database
+      const user = await UserModel.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: "Email not found" });
+      }
+      // Generate a reset token
+      const token = crypto.randomBytes(20).toString("hex");
+      // Store the token with the user's email in a database or in-memory store
+      user.resetToken = token;
+      await user.save();
+      // Send the reset token to the user's email
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.gmail,
+          pass: process.env.password,
+        },
+      });
+      const mailOptions = {
+        from: process.env.gmail,
+        to: email,
+        subject: "Password Reset",
+        text: `Click the following link to reset your password: http://localhost:3000/reset-password/${token}`,
+      };
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(error);
+          res.status(500).send("Error sending email");
+        } else {
+          console.log(`Email sent: ${info.response}`);
+          res
+            .status(200)
+            .send("Check your email for instructions on resetting your password");
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error", error });
+    }
+  },
+  
+ resetPassword : async (req, res) => {
+    const { token, password } = req.body;
+    if (!token) {
+      return res.status(401).json({ message: "Token invalid" });
+    }
+    // Find the user with the given token and update their password
+    const user = await UserModel.findOne({ resetToken: token });
+    if (user) {
+      console.log(user);
+      user.password = await bcrypt.hash(password, 10);
+      user.resetToken = null;
+      await user.save();
+      res.status(200).send("Password updated successfully");
+    } else {
+      res.status(404).send("Invalid or expired token");
+    }
+  },
   getUsers: [
     authenticateJWT,
     authorizeRole(["admin", "mentor"]),

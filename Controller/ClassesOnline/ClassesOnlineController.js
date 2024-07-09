@@ -7,45 +7,47 @@ module.exports = {
         title,
         progress,
         duration,
-        StartDate,
+        startDate,
         mentorId,
-      
         price,
         description,
+        links, // Include links in the request body
       } = req.body;
 
       // Validate input
-      if (
-        !title ||
-        !duration ||
-        !StartDate ||
-        !mentorId ||
-    
-        !price ||
-        !description
-      ) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid input data" });
+      if (!title || !duration || !startDate || !mentorId || !price || !description) {
+        return res.status(400).json({ success: false, message: "Invalid input data" });
       }
 
       const newClass = new Classes({
-        title,
-        progress: progress || 0,
-        duration: 0,
-        StartDate,
-        mentorId,
-       
-        price,
-        description,
+        title: 'Your Class Title',
+        duration: 60, // in hours
+        startDate: new Date(),
+        progress: 0,
+        mentorId: someMentorId, // ObjectId of the mentor
+        studentIds: [student1Id, student2Id], // Array of student ObjectIds
+        price: 100, // price in your currency
+        description: 'Description of your class',
+        links: {
+          github: '',
+          jira: '',
+          slack: '',
+          Figma: '',
+          meet: '',
+        },
       });
-
+      
+      newClass.save()
+        .then(savedClass => {
+          console.log('Class saved successfully:', savedClass);
+        })
+        .catch(error => {
+          console.error('Error saving class:', error);
+        });
       const savedClass = await newClass.save();
       return res.status(201).json({ success: true, data: savedClass });
     } catch (err) {
-      return res
-        .status(500)
-        .json({ success: false, message: "Server error", error: err.message });
+      return res.status(500).json({ success: false, message: "Server error", error: err.message });
     }
   },
 

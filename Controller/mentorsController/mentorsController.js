@@ -1,21 +1,77 @@
 const MentorModel = require('../../model/MentorsModel');
 const { authenticateJWT } = require('../../utils/auth');
-const { sendWelcomeEmail, sendEmailToMentor } = require('../../Controller/sendEmailToMentor/sendEmailToMentor'); 
+const nodemailer = require('nodemailer');
+
+const dotenv = require('dotenv');
+dotenv.config();
+
+const transporter = nodemailer.createTransport({
+  host: process.env.MAIL_HOST,
+  port: process.env.MAIL_PORT,
+  auth: {
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASSWORD
+  }
+});
 
 module.exports = {
- 
- createMentor : async (req, res) => {
-  try {
-    const mentor = new MentorModel(req.body);
-    const savedMentor = await mentor.save();
-    await sendEmailToMentor(savedMentor);
 
-    return res.status(201).json({ message: "Mentor created successfully", data: savedMentor });
-  } catch (error) {
-    console.error("Error creating mentor:", error);
-    return res.status(500).json({ message: "Failed to create mentor", error: error.message });
-  }
-},
+  sendEmail: async (dto) => {
+    const { sender, recipients, subject, message } = dto;
+
+    try {
+      const result = await transporter.sendMail({
+        from: sender,
+        to: recipients.map(recipient => recipient.address).join(', '),
+        subject,
+        html: message, // Use html for HTML content
+        text: message  // Use text for plain text content
+      });
+
+      console.log('Email sent:', result);
+      return result;
+    } catch (error) {
+      console.error('Error sending email:', error);
+      throw error; // Ensure errors are propagated back to the caller
+    }
+  },
+
+  createMentor: async (req, res) => {
+    try {
+      const mentor = new MentorModel(req.body);
+      const savedMentor = await mentor.save();
+
+      // Prepare email details
+      const sender = {
+        name: 'Admin',
+        address: process.env.MAIL_USER
+      };
+
+      const recipients = [{
+        name: savedMentor.name,
+        address: savedMentor.contact_information.email // Assuming the mentor's email is in the savedMentor object
+      }];
+
+      try {
+        const emailResult = await module.exports.sendEmail({
+          sender,
+          recipients,
+          subject: 'Welcome to Our Platform',
+          message: `Hello ${savedMentor.name},\n\nWelcome to Sqilco! Your account has been created, and you can log in with the following credentials:\n\nEmail: ${savedMentor.contact_information.email}\nPassword: Password123!`
+        });
+
+        console.log('Email sent:', emailResult);
+      } catch (emailError) {
+        console.error('Error sending welcome email:', emailError);
+        // Handle email sending error, but allow mentor creation to continue
+      }
+
+      return res.status(201).json({ message: "Mentor created successfully", data: savedMentor });
+    } catch (error) {
+      console.error("Error creating mentor:", error);
+      return res.status(500).json({ message: "Failed to create mentor", error: error.message });
+    }
+  },
   getAllMentors: async (req, res) => {
     try {
       const mentors = await MentorModel.find();

@@ -6,12 +6,11 @@ const ClassesSchema = new mongoose.Schema({
     required: true,
   },
   duration: {
-    type:  Number,
+    type: Number,
     default: 0,
   },
-  StartDate:{
+  startDate: {
     type: Date,
-
   },
   progress: {
     type: Number,
@@ -24,7 +23,7 @@ const ClassesSchema = new mongoose.Schema({
   },
   studentIds: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // assuming you have a User model for students
+    ref: 'User', // Assuming you have a User model for students
   }],
   price: {
     type: Number,
@@ -34,8 +33,15 @@ const ClassesSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  
-  
+  links: { // Add links object to store various links
+    type: {
+      github: String,
+      jira: String,
+      slack: String,
+      Figma: String,
+      meet: String,
+    },
+  },
 });
 
 const Classes = mongoose.models.Classes || mongoose.model('Classes', ClassesSchema);
