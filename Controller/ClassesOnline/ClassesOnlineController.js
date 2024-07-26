@@ -7,47 +7,33 @@ module.exports = {
         title,
         progress,
         duration,
-        startDate,
+        StartDate,
         mentorId,
+        studentIds,
         price,
         description,
-        links, // Include links in the request body
+        imageURL,
       } = req.body;
 
-      // Validate input
-      if (!title || !duration || !startDate || !mentorId || !price || !description) {
-        return res.status(400).json({ success: false, message: "Invalid input data" });
-      }
-
+  
       const newClass = new Classes({
-        title: 'Your Class Title',
-        duration: 60, // in hours
-        startDate: new Date(),
-        progress: 0,
-        mentorId: someMentorId, // ObjectId of the mentor
-        studentIds: [student1Id, student2Id], // Array of student ObjectIds
-        price: 100, // price in your currency
-        description: 'Description of your class',
-        links: {
-          github: '',
-          jira: '',
-          slack: '',
-          Figma: '',
-          meet: '',
-        },
+        title,
+        progress: progress || 0,
+        duration: 0,
+        StartDate,
+        mentorId,
+        studentIds,
+        price,
+        description,
+        imageURL,
       });
-      
-      newClass.save()
-        .then(savedClass => {
-          console.log('Class saved successfully:', savedClass);
-        })
-        .catch(error => {
-          console.error('Error saving class:', error);
-        });
+
       const savedClass = await newClass.save();
       return res.status(201).json({ success: true, data: savedClass });
     } catch (err) {
-      return res.status(500).json({ success: false, message: "Server error", error: err.message });
+      return res
+        .status(500)
+        .json({ success: false, message: "Server error", error: err.message });
     }
   },
 
@@ -127,13 +113,13 @@ module.exports = {
   updateClasses: async function (req, res) {
     try {
       const classId = req.params.id;
-      const { title, duration, StartDate, mentorId, price, description } =
+      const { title, duration, StartDate, mentorId, price, description, imageURL } =
         req.body;
 
       // Find the class by ID and update its properties
       const updatedClass = await Classes.findByIdAndUpdate(
         classId,
-        { title, duration, StartDate, mentorId, price, description },
+        { title, duration, StartDate, mentorId, price, description , imageURL},
         { new: true } // Return the updated document
       );
 

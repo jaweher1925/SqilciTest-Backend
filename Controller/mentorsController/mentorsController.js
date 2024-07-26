@@ -29,7 +29,7 @@ module.exports = {
         from: sender,
         to: recipients.map(recipient => recipient.address).join(', '),
         subject,
-        html: message, 
+        html: message,
         text: message,
       });
 
@@ -46,14 +46,25 @@ module.exports = {
       const password = generateRandomPassword(10);
       const mentor = req.body;
       const Mentor = new MentorModel({
-        name : mentor.name,
+        name: mentor.name,
+        profile_picture: mentor.profile_picture,
         designation: mentor.designation,
+        experience: mentor.experience,
         tech_stack: mentor.tech_stack,
-        email :mentor.email,
+        rating: mentor.rating,
+        reviews: mentor.reviews,
+        availability: mentor.availability,
+        contact_information: mentor.contact_information,
+        location: mentor.location,
+        social_media_links: mentor.social_media_links,
+        expertise_areas: mentor.expertise_areas,
+        bio: mentor.bio,
+        email: mentor.email,
         phone: mentor.phone,
-        password:password
-      })
-    Mentor.password = await bcrypt.hash(password, 10);
+        password: password,
+        enrolledClasses: mentor.enrolledClasses,
+      });
+      Mentor.password = await bcrypt.hash(password, 10);
 
       await Mentor.save();
       const sender = {
@@ -117,7 +128,7 @@ module.exports = {
       const updatedMentor = await MentorModel.findByIdAndUpdate(
         req.params.id,
         req.body,
-        { new: true }
+        { new: true, runValidators: true }
       );
       if (!updatedMentor) {
         return res.status(404).json({ message: "Mentor not found" });

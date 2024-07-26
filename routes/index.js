@@ -420,10 +420,7 @@ routes.post('/courses/sales', createCourseSale);
 routes.get('/courses/sales',  getAllCourseSales);
 
 //adding classes to mentors
-routes.patch(
-  "/user/:userId/enrolledClasses",
-  patchEnrolledClasses
-);
+routes.patch( "/user/:userId/enrolledClasses", patchEnrolledClasses);
 routes.patch("/mentors/:mentorId/enrolledClasses", patchEnrolledClassesMentors);
 routes.get("/count-students", countStudents);
 routes.patch("/user/:userId/enrolledProjects", patchEnrolledProjects);

@@ -195,9 +195,10 @@ loginUser : async (req, res) => {
     try {
       console.log("Fetching profile for user ID:", req.params.userId); // Debugging log
 
-      const user = await UserModel.findById(req.params.userId).select(
-        "-password"
-      );
+      const user = await UserModel.findById(req.params.userId)
+      //.select(
+      // "-password"
+      //);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -272,7 +273,7 @@ loginUser : async (req, res) => {
         }
 
         if (!projectId) {
-          return res.status(400).json({ message: "Project ID is required" });
+          return res.status(400).json({ message: "Project ID is required!!" });
         }
 
         // Validate that userId is a valid ObjectId

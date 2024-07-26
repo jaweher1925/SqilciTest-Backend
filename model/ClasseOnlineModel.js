@@ -33,6 +33,9 @@ const ClassesSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  imageURL: {
+    type: String,
+  },
   links: { // Add links object to store various links
     type: {
       github: String,
