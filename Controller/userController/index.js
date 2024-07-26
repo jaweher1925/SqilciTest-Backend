@@ -1,4 +1,5 @@
 const UserModel = require("../../model/UserModel");
+const MentorModel = require("../../model/MentorsModel")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { authenticateJWT, authorizeRole } = require("../../utils/auth");
@@ -8,11 +9,13 @@ const axios = require("axios");
 
 module.exports = {
   registerUser: async (req, res) => {
-    const userModel = new UserModel(req.body);
+  
+    const userModel = new UserModel(req.body);    
     userModel.password = await bcrypt.hash(req.body.password, 10);
     try {
       const response = await userModel.save();
       response.password = undefined;
+
       return res.status(201).json({ message: "success", data: response });
     } catch (err) {
       return res
@@ -21,25 +24,39 @@ module.exports = {
     }
   },
 
-  loginUser: async (req, res) => {
+loginUser : async (req, res) => {
     try {
-      const user = await UserModel.findOne({ email: req.body.email });
+      // Check the User collection first
+      let user = await UserModel.findOne({ email: req.body.email });
+  
+      // If no user found, check the Mentor collection
+      if (!user) {
+
+        user = await MentorModel.findOne({ email: req.body.email });
+       
+      }
+  
+      // If no user found in both collections, return authentication error
       if (!user) {
         return res.status(401).json({
-          message: "Authentication failed. Invalid email or password",
+          message: 'Authentication failed. Invalid email or password',
         });
       }
+  
+      if(user.password==req.body.password){
+        return res.status(200).json({message: "success compare", data: response} )
 
-      const isPassEqual = await bcrypt.compare(
-        req.body.password,
-        user.password
-      );
+      }
+      // Compare passwords
+     const isPassEqual = await bcrypt.compare(req.body.password, user.password);
+    
       if (!isPassEqual) {
         return res.status(401).json({
-          message: "Authentication failed. Invalid email or password",
+          message: 'Authentication failed. ...',
         });
       }
-
+  
+      // Create token object
       const tokenObject = {
         _id: user._id,
         first_name: user.first_name,
@@ -47,18 +64,22 @@ module.exports = {
         email: user.email,
         role: user.role,
       };
+  
+      // Generate JWT token
       const jwtToken = jwt.sign(tokenObject, process.env.SECRET, {
-        expiresIn: "4h",
+        expiresIn: '4h',
       });
-      res.cookie("jwtToken", jwtToken, { httpOnly: true });
+  
+      // Set JWT token as cookie
+      res.cookie('jwtToken', jwtToken, { httpOnly: true });
+  
+      // Return token and user details
       return res.status(200).json({ jwtToken, tokenObject });
     } catch (err) {
-      return res
-        .status(500)
-        .json({ message: "Failed to login user", error: err.message });
+      return res.status(500).json({ message: 'Failed to login user', error: err.message });
     }
   },
-
+  
   logoutUser: async (req, res) => {
     try {
       res.clearCookie("jwtToken");

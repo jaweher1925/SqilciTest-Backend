@@ -8,11 +8,11 @@ const MentorValidation = (req, res, next) => {
         experience: Joi.string(),
         tech_stack: Joi.array().items(Joi.string()).min(1).required(),
         rating: Joi.number(),
-        reviews: Joi.array().items(Joi.object({
-            user: Joi.string().required(),
-            rating: Joi.number().required(),
-            comment: Joi.string().required()
-        })),
+            reviews: Joi.array().items(Joi.object({
+                user: Joi.string().required(),
+                rating: Joi.number().required(),
+                comment: Joi.string().required()
+            })),
         availability: Joi.object({
             isAvailable: Joi.boolean().required(),
             availableDays: Joi.array().items(Joi.string()),
@@ -21,11 +21,11 @@ const MentorValidation = (req, res, next) => {
                 end: Joi.string()
             })
         }).required(),
-        contact_information: Joi.object({
-            email: Joi.string().email(),
-            phone: Joi.string(),
-            website: Joi.string().uri()
-        }),
+      
+        email: Joi.string(),
+        phone: Joi.string(),
+          
+        
         location: Joi.object({
             city: Joi.string(),
             country: Joi.string()

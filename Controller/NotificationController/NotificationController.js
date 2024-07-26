@@ -2,21 +2,26 @@ const SendNotificationModel = require("../../model/SendNotificationModel");
 
 // Create a new notification
 module.exports = {
-createNotification : async (userId, message, type) => {
-  try {
-    const newNotification = new SendNotificationModel({
-      userId,
-      message,
-      type,
-      read: false, // By default, notifications are unread
-      createdAt: new Date(),
-    });
-    await newNotification.save();
-    return newNotification;
-  } catch (error) {
-    throw Error("Failed to create notification");
-  }
-},
+  createNotification: async (userId, message, type) => {
+    console.log("Creating notification for user:", userId);
+    console.log("Notification details:", { message, type });
+    
+    try {
+      const newNotification = new SendNotificationModel({
+        userId,
+        message,
+        type,
+        read: false, // Default value
+        createdAt: new Date(),
+      });
+      const savedNotification = await newNotification.save();
+      console.log("Notification created successfully:", savedNotification);
+      return savedNotification;
+    } catch (error) {
+      console.error("Failed to create notification:", error);
+      throw new Error("Failed to create notification");
+    }
+  },
 
 // Get all notifications for a user
  getNotificationsByUser : async (req, res) => {
@@ -29,11 +34,12 @@ createNotification : async (userId, message, type) => {
   }
 },
 
+
 // Mark notification as read
-markNotificationAsRead : async (req, res) => {
-  const notificationId = req.params.notificationId; // Assuming notificationId is passed in the URL params
+markNotificationAsRead: async (req, res) => {
+  const notificationId = req.params.notificationId;
   try {
-    const notification = await Notification.findByIdAndUpdate(
+    const notification = await SendNotificationModel.findByIdAndUpdate(
       notificationId,
       { read: true },
       { new: true }
@@ -45,6 +51,17 @@ markNotificationAsRead : async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Failed to mark notification as read" });
   }
+},
+// Backend: Add this to your controller
+deleteNotification: async (req, res) => {
+  const notificationId = req.params.notificationId;
+  try {
+    await SendNotificationModel.findByIdAndDelete(notificationId);
+    res.json({ message: "Notification deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete notification" });
+  }
 }
+
 
 };

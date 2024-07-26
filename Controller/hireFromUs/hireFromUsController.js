@@ -79,7 +79,7 @@ module.exports = {
       // Create notification
       await createNotification(
         hireTalent.userId,
-        "Your hiring talent request has been approved.",
+        "Your hiring talent request has been approved. We will contact You soon for a meet ",
         "hire-talent"
       );
       res.json(hireTalent);
@@ -99,12 +99,7 @@ module.exports = {
       if (!hireTalent) {
         return res.status(404).json({ error: "HireTalent not found" });
       }
-      // Create notification
-      await createNotification(
-        hireTalent.userId,
-        "Your hiring talent request has been rejected.",
-        "hire-talent"
-      );
+    
       res.json(hireTalent);
     } catch (error) {
       console.error("Error rejecting hire talent:", error);

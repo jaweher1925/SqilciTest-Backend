@@ -1,10 +1,11 @@
+// models/portfolioModel.js
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const CommentSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
-    ref: 'users'
+    ref: 'User'
   },
   text: {
     type: String,
@@ -19,7 +20,7 @@ const CommentSchema = new Schema({
 const PortfolioSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
-    ref: 'users'
+    ref: 'User'
   },
   title: {
     type: String,
@@ -33,7 +34,7 @@ const PortfolioSchema = new Schema({
   tags: [String],
   likes: [{
     type: Schema.Types.ObjectId,
-    ref: 'users'
+    ref: 'User'
   }],
   comments: [CommentSchema],
   createdAt: {
@@ -46,6 +47,7 @@ const PortfolioSchema = new Schema({
   }
 });
 
-const PortfolioModel = mongoose.model('portfolios', PortfolioSchema);
+// Make sure the model name is "Portfolio" and not "Portfolios"
+const PortfolioModel = mongoose.model('Portfolio', PortfolioSchema);
 
 module.exports = PortfolioModel;

@@ -151,10 +151,19 @@ const {
     deleteCourseSale
 } = require('../Controller/CoursesSells/courseSalesController');
 
-const { createClass, updateClasses, getOnlineClasses,deleteClasses, getClass,updateClassProgress, addStudentToClass } = require('../Controller/ClassesOnline/ClassesOnlineController');
+const { 
+  createClass, 
+  updateClasses, 
+  getOnlineClasses, 
+  deleteClasses, 
+  getClass, 
+  updateClassProgress, 
+  addStudentToClass 
+} = require('../Controller/ClassesOnline/ClassesOnlineController');
+
 const { createClassApplicant,getAllClassApplicants, getClassApplicantById,updateClassApplicant, deleteClassApplicant, updateApplicationStatus} = require('../Controller/classApplicationController/classApplicationController');
 
-const {getNotificationsByUser , markNotificationAsRead} = require('../Controller/NotificationController/NotificationController')
+const {getNotificationsByUser , markNotificationAsRead,deleteNotification} = require('../Controller/NotificationController/NotificationController')
 
 
 // User routes
@@ -217,13 +226,13 @@ routes.post(
   );
   
 // Classes routes
-routes.post('/OnlineClasses',  createClass); // Create a new course
-routes.put('/OnlineClasses/:id', updateClasses); 
-routes.get("/OnlineClasses/:id", getClass); 
-routes.patch('/classes/:id/progress', updateClassProgress); // Assuming this is a PATCH request
-routes.get('/OnlineClasses', getOnlineClasses); 
-routes.delete('/OnlineClasses/:id',deleteClasses);
-routes.patch("/classes/:id/add-student", addStudentToClass);
+routes.post('/OnlineClasses', createClass); // Create a new class
+routes.put('/OnlineClasses/:id', updateClasses); // Update class by ID
+routes.get('/OnlineClasses/:id', getClass); // Get a specific class by ID
+routes.patch('/OnlineClasses/:id/progress', updateClassProgress); // Update class progress by ID
+routes.get('/OnlineClasses', getOnlineClasses); // Get all online classes
+routes.delete('/OnlineClasses/:id', deleteClasses); // Delete class by ID
+routes.patch('/OnlineClasses/:id/add-student', addStudentToClass); // Add student to class
 
 //class application routes 
 routes.post('/class-applications', createClassApplicant);
@@ -396,7 +405,7 @@ routes.put('/hire-from-us/reject/:id', rejectHireTalent);
 
 
 routes.get("/notifications/:userId", getNotificationsByUser);
-
+routes.delete('/notifications/:notificationId', deleteNotification);
 routes.put("/notifications/:notificationId", markNotificationAsRead);
 // Task CRUD routes
 routes.post('/tasks', createTask);

@@ -6,6 +6,7 @@ const MentorSchema = new Schema({
     type: String,
     required: true,
   },
+
   designation: {
     type: String,
     required: true,
@@ -16,15 +17,28 @@ const MentorSchema = new Schema({
     required: true,
   },
   rating: Number,
-  contact_information: {
-    email: String,
-    phone: String,
+  email:{
+    type:String,
+    required:true,
+   
   },
-  user_id: { // Reference to User
-    type: Schema.Types.ObjectId,
-    ref: 'users',
-    required: true,
+
+  phone:{
+    type:String,
+    required:true,
   },
+
+  password:{
+    type:String,
+    required:true,
+    
+  },
+  role:{
+    type:String,
+    default:"mentor"  
+  },
+  
+  // Add any other fields you need for your application
   createdAt: {
     type: Date,
     default: Date.now,
@@ -36,4 +50,5 @@ const MentorSchema = new Schema({
 });
 
 const MentorModel = mongoose.model("mentors", MentorSchema);
+
 module.exports = MentorModel;

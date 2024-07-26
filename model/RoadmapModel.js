@@ -23,7 +23,7 @@ const SubtopicSchema = new Schema({
 const RoadmapSchema = new Schema({
   id: {
     type: Number,
-    required: true,
+   
     unique: true,
   },
   title: {

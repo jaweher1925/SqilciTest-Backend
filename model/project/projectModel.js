@@ -47,6 +47,29 @@ const ProjectSchema = new Schema({
         type: String,
         required: true
     },
+    
+    links: {
+        github: {
+            type: String,
+            default: ''
+        },
+        jira: {
+            type: String,
+            default: ''
+        },
+        slack: {
+            type: String,
+            default: ''
+        },
+        Figma: {
+            type: String,
+            default: ''
+        },
+        meet: {
+            type: String,
+            default: ''
+        }
+    },
     createdAt: {
         type: Date,
         default: Date.now
